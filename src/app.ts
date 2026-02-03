@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 
 import ConnectionDB from "./Configs/ConnectionDB";
+import routes from "./Routes/routes";
 class App {
   public app;
 
@@ -13,7 +14,9 @@ class App {
     this.routes();
   }
 
-  routes() {}
+  routes() {
+    this.app.use("/", routes);
+  }
 
   middlewares() {
     this.app.use(cors({ origin: "*" }));
