@@ -1,0 +1,43 @@
+# Top-level EditorConfig file
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 2
+
+# Markdown – mantém espaços finais (listas, etc.)
+[*.md]
+trim_trailing_whitespace = false
+
+# Makefile – sempre tab
+[Makefile]
+indent_style = tab
+
+# CSS / SCSS
+[*.{css,scss}]
+indent_style = space
+indent_size = 2
+
+# HTML / EJS
+[*.{html,ejs}]
+indent_style = space
+indent_size = 2
+
+# JSON
+[*.json]
+indent_style = space
+indent_size = 2
+
+# YAML
+[*.{yml,yaml}]
+indent_style = space
+indent_size = 2
+
+# JavaScript / TypeScript (inclui front e back)
+[*.{js,jsx,ts,tsx,cjs,mjs}]
+indent_style = space
+indent_size = 2
