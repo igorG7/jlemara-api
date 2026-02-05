@@ -1,6 +1,6 @@
 import express from "express";
 import cors from "cors";
-
+import './Lib/Redis'
 import ConnectionDB from "./Configs/ConnectionDB";
 import routes from "./Routes/routes";
 class App {
@@ -8,7 +8,6 @@ class App {
 
   constructor() {
     this.app = express();
-
     this.config();
     this.middlewares();
     this.routes();
