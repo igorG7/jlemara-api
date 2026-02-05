@@ -3,7 +3,7 @@ import { Router } from "express";
 
 import userRoutes from "./user.routes";
 import pendingIssuesRoutes from "./pendingissues.routes";
-import { verifyToken } from "../Middlewares/Users/verifyToken";
+import { verifyToken } from "../Middlewares/Auth/verifyToken";
 
 const routes = Router();
 

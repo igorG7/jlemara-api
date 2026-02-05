@@ -8,7 +8,7 @@ import { validateUpdateKeys } from "../Middlewares/Users/validateUpdateKeys";
 import { validateRegister } from "../Middlewares/Users/validateRegister";
 import { validateUpdatePass } from "../Middlewares/Users/validateUpdatePass";
 import { validateFindUser } from "../Middlewares/Users/validateFindUser";
-import { verifyToken } from "../Middlewares/Users/verifyToken";
+import { verifyToken } from "../Middlewares/Auth/verifyToken";
 //
 
 const routes = Router();
