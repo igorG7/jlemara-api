@@ -33,7 +33,7 @@ export const validateRegister = (
     "phone",
     "role",
     "company",
-    "instance",
+    // "instance", // propriedade legada | relacionada ao uso da api não oficial da meta
     "isActive",
     "pendingIssues",
   ];

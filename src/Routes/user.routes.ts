@@ -8,6 +8,7 @@ import { validateUpdateKeys } from "../Middlewares/Users/validateUpdateKeys";
 import { validateRegister } from "../Middlewares/Users/validateRegister";
 import { validateUpdatePass } from "../Middlewares/Users/validateUpdatePass";
 import { validateFindUser } from "../Middlewares/Users/validateFindUser";
+import { verifyToken } from "../Middlewares/Users/verifyToken";
 //
 
 const routes = Router();
@@ -18,12 +19,12 @@ routes.post("/login", hasUserData, User.authUser);
 routes.post("/register", validateRegister, User.registerUser);
 
 //  Rotas de Consulta (GET)
-routes.get("/user/id", validateFindUser, User.findUser);
-routes.get("/user/email", validateFindUser, User.findUser);
-routes.get("/active", User.findActiveUsers);
+routes.get("/user/id", verifyToken, validateFindUser, User.findUser);
+routes.get("/user/email", verifyToken, validateFindUser, User.findUser);
+routes.get("/active", verifyToken, User.findActiveUsers);
 
 //  Rotas de Atualização (PUT/PATCH)
-routes.patch("/update", validateUpdateKeys, User.updateUser);
-routes.patch("/update/password", validateUpdatePass, User.updateUserPass);
+routes.patch("/update", verifyToken, validateUpdateKeys, User.updateUser);
+routes.patch("/update/password", verifyToken, validateUpdatePass, User.updateUserPass);
 
 export default routes;
