@@ -26,7 +26,7 @@ class CostumerController {
     }
   }
 
-  async findByKey(req: Request, res: Response) {
+  async findCustomer(req: Request, res: Response) {
     try {
       const query = req.body;
 
