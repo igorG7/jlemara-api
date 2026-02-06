@@ -51,28 +51,5 @@ redis.on("reconnecting", () => {
   Console({ type: "warn", message: "Redis: Tentando reconectar automaticamente..." });
 });
 
-/**
- * CENTRALIZAÇÃO DE CHAVES (NAMESPACING)
- */
-
-
-export const REDIS_KEYS = {
-  UAU_TOKEN: "uau:auth:token",
-  QUEUE_DISPARO: "queue:disparos:pendentes",
-  QUEUE_SYNC_CLIENTES: "queue:sync:uau:clientes",
-  MSG_STATUS: (msgId: string | number) => `atendimento:msg:${msgId}:status`,
-  USER_SESSION: (userId: string | number) => `auth:session:${userId}`,
-} as const;
-
-/**
- * PADRÕES DE EXPIRAÇÃO (TTL)
- */
-export const REDIS_EXP = {
-  TOKEN_UAU: 13800,
-  WEBHOOK_TEMP: 600,
-  SESSION: 86400 * 7,
-} as const;
-
-// Exportamos a instância como default e as chaves/expiração como nomeadas
 export { redis };
 export default redis;
