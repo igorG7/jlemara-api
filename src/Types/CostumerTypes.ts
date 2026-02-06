@@ -3,8 +3,11 @@ export type PersonType = "PF" | "PJ";
 export type AddressType = {
   street: string;
   number: number;
-  neighborhood: string;
+  district: string;
   city: string;
+  country: string;
+  state: string;
+  zip_code: string;
 };
 
 export interface CustomerType {
