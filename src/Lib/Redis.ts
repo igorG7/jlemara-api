@@ -54,6 +54,8 @@ redis.on("reconnecting", () => {
 /**
  * CENTRALIZAÇÃO DE CHAVES (NAMESPACING)
  */
+
+
 export const REDIS_KEYS = {
   UAU_TOKEN: "uau:auth:token",
   QUEUE_DISPARO: "queue:disparos:pendentes",
