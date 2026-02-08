@@ -8,5 +8,6 @@ const routes = Router();
 
 routes.post("/create", Customer.createClient); // * Temporario
 routes.get("/find", validateFindCustomer, Customer.findCustomer);
+routes.get("/find/name", Customer.findCustomerByPartialName);
 
 export default routes;
