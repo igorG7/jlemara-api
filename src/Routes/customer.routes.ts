@@ -10,5 +10,6 @@ routes.post("/create", Customer.createClient); // * Temporario
 routes.get("/find", validateFindCustomer, Customer.findCustomer);
 routes.get("/find/name", Customer.findCustomerByPartialName);
 routes.get("/", Customer.listAll);
+routes.get("/actives", Customer.listAllActiveCustomers);
 
 export default routes;
