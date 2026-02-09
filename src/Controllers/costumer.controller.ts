@@ -1,8 +1,6 @@
 import { Request, response, Response } from "express";
 import Console from "../Lib/Console";
 import Customer from "../Models/Costumer";
-import { PassThrough } from "stream";
-import { error } from "console";
 
 class CostumerController {
   async register(data: any) {
