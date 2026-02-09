@@ -2,6 +2,7 @@ import { Request, response, Response } from "express";
 import Console from "../Lib/Console";
 import Customer from "../Models/Costumer";
 import { PassThrough } from "stream";
+import { error } from "console";
 
 class CostumerController {
   async register(data: any) {
@@ -99,6 +100,36 @@ class CostumerController {
       if (!customers.length) {
         Console({ type: "warn", message: "Nenhum cliente encontrado." });
 
+        return res.status(404).json({
+          message: "Nenhum cliente encontrado.",
+          error: null,
+          data: [],
+        });
+      }
+
+      Console({ type: "success", message: "Busca concluída com sucesso." });
+      return res
+        .status(200)
+        .json({ message: "Busca concluída com sucesso.", data: customers });
+    } catch (error) {
+      Console({ type: "error", message: "Erro interno inesperado." });
+      return res
+        .status(500)
+        .json({ message: "Erro interno inesperado.", error });
+    }
+  }
+
+  async listAllActiveCustomers(req: Request, res: Response) {
+    try {
+      Console({ type: "log", message: "Buscando clientes ativos." });
+
+      const customers = await Customer.find(
+        { status: 1 },
+        { password: 0 },
+      ).lean();
+
+      if (!customers.length) {
+        Console({ type: "warn", message: "Nenhum cliente encontrado." });
         return res.status(404).json({
           message: "Nenhum cliente encontrado.",
           error: null,
