@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import Console from "../Lib/Console";
 import bcrypt from "bcryptjs";
-
+import jwt from 'jsonwebtoken'
 import User from "../Models/User";
 
 import { UserType } from "../Models/User";
@@ -69,10 +69,47 @@ class UserController {
 
       const userUpdated = (await this.updateUserAccess(user._id)) ?? user;
 
+
+      //       CONTEXTO DE ALTERAÇÕES:
+      /* * ARQUITETURA DE SESSÃO CENTRALIZADA (SSO & SEGURANÇA)
+       * ---------------------------------------------------
+       * EVOLUÇÃO: Migração da gestão de cookies do Client-side para Server-side.
+       * * BENEFÍCIOS:
+       * 1. SEGURANÇA (Anti-XSS): Flag 'httpOnly' impede que scripts maliciosos acessem o token.
+       * 2. ESCALABILIDADE (Subdomínios): O uso de '.seudominio.com' garante que módulos
+       * independentes (vendas, obras, lotes) compartilhem a mesma sessão automaticamente.
+       * 3. PERFORMANCE: Payload JWT (ID, Name, Role) evita consultas excessivas ao DB.
+       * * FLUXO:
+       * 1. API valida credenciais e gera JWT assinado com dados de acesso.
+       * 2. O Header 'Set-Cookie' instrui o browser a persistir a sessão de forma segura.
+       * 3. Browser anexa o cookie automaticamente em todas as requisições para dominio e subdomínios.
+       */
+
+
+      const token = jwt.sign(
+        {
+          id: userUpdated._id,
+          name: userUpdated.name,
+          role: userUpdated.role
+        },
+        process.env.JWT_SECRET as string,
+        { expiresIn: '7d' }
+      );
+
       Console({
         type: "success",
         message: "Usuário autenticado com sucesso.",
       });
+
+      res.cookie('auth_token', token, {
+        domain: process.env.DOMAIN_DEV!, // Permite acesso em todos os subdomínios
+        path: '/',                 // Disponível em todo o site
+        httpOnly: true,            // Impede leitura via document.cookie (segurança)
+        secure: process.env.NODE_ENV === 'production', // Só envia via HTTPS em produção
+        sameSite: 'lax',           // Permite que o cookie seja enviado em navegações entre subdomínios
+        maxAge: 1 * 4 * 60 * 60 * 1000 // 4 HORAS
+      });
+
 
       return res.status(200).json({
         message: "Usuário autenticado com sucesso.",
