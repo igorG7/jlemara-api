@@ -2,6 +2,12 @@ import { Request, response, Response } from "express";
 import Console from "../Lib/Console";
 import Customer from "../Models/Costumer";
 
+const notReturn = {
+  password: 0,
+  createdAt: 0,
+  updatedAt: 0,
+};
+
 class CostumerController {
   async register(data: any) {
     const key = data.code_person;
@@ -31,7 +37,7 @@ class CostumerController {
       const query = req.body;
 
       Console({ type: "log", message: "Buscando cliente" });
-      const customer = await Customer.findOne(query, { password: 0 });
+      const customer = await Customer.findOne(query, { ...notReturn });
 
       if (!customer) {
         return res
@@ -60,7 +66,7 @@ class CostumerController {
         {
           full_name: { $regex: name, $options: "i" },
         },
-        { password: 0 },
+        { ...notReturn },
       ).lean();
 
       if (!customers.length) {
@@ -93,7 +99,7 @@ class CostumerController {
     try {
       Console({ type: "log", message: "Buscando todos os clientes." });
 
-      const customers = await Customer.find({}, { password: 0 }).lean();
+      const customers = await Customer.find({}, { ...notReturn }).lean();
 
       if (!customers.length) {
         Console({ type: "warn", message: "Nenhum cliente encontrado." });
@@ -123,7 +129,7 @@ class CostumerController {
 
       const customers = await Customer.find(
         { status: 1 },
-        { password: 0 },
+        { ...notReturn },
       ).lean();
 
       if (!customers.length) {
@@ -154,7 +160,7 @@ class CostumerController {
       const customerUpdated = await Customer.findByIdAndUpdate(
         id,
         { ...body, updatedAt: new Date() },
-        { new: true },
+        { new: true, ...notReturn },
       );
 
       if (!customerUpdated) {
