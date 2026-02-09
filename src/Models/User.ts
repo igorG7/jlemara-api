@@ -34,7 +34,7 @@ export interface UserType {
 
   role?: UserRole; // multiple roles if needed
   company?: string; // company / logical instance id
-  instance?: string; // e.g. WhatsApp instance / tenant id
+  // instance?: string; // e.g. WhatsApp instance / tenant id // legado
 
   isActive?: boolean;
   pendingIssues?: PendingUserIssueType[];
@@ -87,13 +87,13 @@ const UserSchema = new Schema<UserType>(
       required: true,
     },
 
-    // WhatsApp instance / queue / tenant
-    instance: {
-      type: String,
-      trim: true,
-      default: "",
-      required: true,
-    },
+    // WhatsApp instance / queue / tenant | *** L E G A D O ***
+    /*  instance: {
+       type: String,
+       trim: true,
+       default: "",
+       required: true,
+     }, */
 
     isActive: {
       type: Boolean,
