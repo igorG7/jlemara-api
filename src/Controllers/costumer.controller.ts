@@ -148,6 +148,39 @@ class CostumerController {
         .json({ message: "Erro interno inesperado.", error });
     }
   }
+
+  async updateCustomer(req: Request, res: Response) {
+    try {
+      const { id, ...body } = req.body;
+
+      const customerUpdated = await Customer.findByIdAndUpdate(
+        id,
+        { ...body, updatedAt: new Date() },
+        { new: true },
+      );
+
+      if (!customerUpdated) {
+        Console({ type: "error", message: "Cliente não encontrado." });
+        return res
+          .status(404)
+          .json({ message: "Cliente não encontrado.", error: null });
+      }
+
+      Console({
+        type: "success",
+        message: "Atualização de cliente concluída.",
+      });
+      return res.status(200).json({
+        message: "Atualização de cliente concluída.",
+        data: customerUpdated,
+      });
+    } catch (error) {
+      Console({ type: "error", message: "Erro interno inesperado." });
+      return res
+        .status(500)
+        .json({ message: "Erro interno inesperado.", error });
+    }
+  }
 }
 
 export default new CostumerController();
