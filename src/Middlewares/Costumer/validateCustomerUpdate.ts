@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import Console from "../../Lib/Console";
 
 /**
- * Middleware responsável por validar as chaves enviadas na atuaçização de um cliente.
+ * Middleware responsável por validar as chaves enviadas na atualização de um cliente.
  * Regras de validação:
  * - O campo `id` é obrigatório e deve estar presente no corpo da requisição.
  * - O corpo da requisição deve conter ao menos um campo para atualização.
