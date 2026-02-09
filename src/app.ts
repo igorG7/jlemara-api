@@ -19,6 +19,7 @@ class App {
 
   middlewares() {
     this.app.use(cors({ origin: "*" }));
+    this.app.use(cookieParser());
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
   }
