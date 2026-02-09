@@ -38,7 +38,7 @@ class CostumerController {
 
       Console({ type: "log", message: "Buscando cliente" });
       const customer = await Customer.findOne(query, {
-        select: { ...notReturn },
+        ...notReturn,
       });
 
       if (!customer) {
@@ -68,7 +68,7 @@ class CostumerController {
         {
           full_name: { $regex: name, $options: "i" },
         },
-        { select: { ...notReturn } },
+        { ...notReturn },
       ).lean();
 
       if (!customers.length) {
@@ -101,10 +101,7 @@ class CostumerController {
     try {
       Console({ type: "log", message: "Buscando todos os clientes." });
 
-      const customers = await Customer.find(
-        {},
-        { select: { ...notReturn } },
-      ).lean();
+      const customers = await Customer.find({}, { ...notReturn }).lean();
 
       if (!customers.length) {
         Console({ type: "warn", message: "Nenhum cliente encontrado." });
@@ -134,7 +131,7 @@ class CostumerController {
 
       const customers = await Customer.find(
         { status: 1 },
-        { select: { ...notReturn } },
+        { ...notReturn },
       ).lean();
 
       if (!customers.length) {
