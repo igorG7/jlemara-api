@@ -14,7 +14,7 @@ app.listen(PORT, async () => {
   console.log(`Servidor rodando em http://localhost:${PORT}.`);
 
   const controller = new UauCustomerController()
-  const data = await controller.findAdressCostumer(18808)
+  // const data = await controller.findAdressCostumer(18808)
   /* const data = await controller.deletePhoneCostumer(28002, [
     {
       DDD: '031',

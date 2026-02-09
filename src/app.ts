@@ -3,6 +3,7 @@ import cors from "cors";
 import './Lib/Redis'
 import ConnectionDB from "./Configs/ConnectionDB";
 import routes from "./Routes/routes";
+import cookieParser from "cookie-parser";
 class App {
   public app;
 
