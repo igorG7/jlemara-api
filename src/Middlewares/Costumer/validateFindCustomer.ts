@@ -1,6 +1,26 @@
 import { Request, Response, NextFunction } from "express";
 import Console from "../../Lib/Console";
 
+/**
+ * Middleware responsável por validar as chaves enviadas na busca de um cliente.
+ * Regras de validação:
+ * - O corpo da requisição deve conter obrigatóriamente uma chave e apenas uma.
+ * - Apenas as chaves previamente definidas em `validKeys` são permitidas para atualização.
+ *
+ * Comportamento:
+ * - Retorna HTTP 400 se `key` não possuir nenhuma chave.
+ * - Retorna HTTP 400 se 'key' possuir mais de uma chave.
+ * - Retorna HTTP 400 se 'key' conter chaves não permitidas para atualização.
+ * - Retorna HTTP 400 se houver alguma chave válida sem valor.
+ * - Caso todas as validações passem, a requisição segue para o próximo middleware
+ *
+ * @param {Request} req - Objeto da requisição do Express contendo o corpo com os dados de atualização.
+ * @param {Response} res - Objeto de resposta do Express.
+ * @param {NextFunction} next - Função que chama o próximo middleware da cadeia.
+ *
+ * @returns {Response | void} Retorna uma resposta HTTP 400 em caso de erro ou chama `next()` em caso de sucesso.
+ */
+
 export const validateFindCustomer = (
   req: Request,
   res: Response,
