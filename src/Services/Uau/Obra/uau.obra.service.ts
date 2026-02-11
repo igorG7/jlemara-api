@@ -1,5 +1,5 @@
-import Console from "../../Lib/Console";
-import uau from "../../Lib/Uau";
+import Console from "../../../Lib/Console";
+import uau from "../../../Lib/Uau";
 import { ResponseFindAllObras, ResponseFindObraWithCode } from "./uau.obra.types";
 
 export default class UauObraService {

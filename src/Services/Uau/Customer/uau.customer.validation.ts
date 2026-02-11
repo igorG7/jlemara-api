@@ -1,14 +1,3 @@
-
-
-/* export async function costumerValidateCPF(value: string) {
-
-  if (!value) throw new Error("O campo CPF é obrigatorio")
-  if (!cpf) throw new Error("CPF é obrigatório para o cadastro.");
-
-  return
-}
- */
-
 export function isValidCPF(cpf: string): boolean {
   // 1. Limpa o CPF e verifica se tem 11 dígitos
   const cleanCPF = cpf.replace(/\D/g, "");
@@ -40,9 +29,7 @@ export function isValidCPF(cpf: string): boolean {
 
   return true;
 }
-
-
-export async function costumerValidateCPF(value: String): Promise<Boolean> {
+export async function customerValidateCPF(value: String): Promise<Boolean> {
 
   if (!value || value.trim() === "") {
     throw new Error("O campo CPF é obrigatorio")
@@ -55,7 +42,7 @@ export async function costumerValidateCPF(value: String): Promise<Boolean> {
   return isValid;
 
 }
-export async function costumerValidateCodPes(value: Number): Promise<Boolean> {
+export async function customerValidateCodPes(value: Number): Promise<Boolean> {
 
   if (!value) {
     throw new Error("O campo cod_pes é obrigatorio")

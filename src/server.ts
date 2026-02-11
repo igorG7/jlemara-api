@@ -1,73 +1,15 @@
 import { configDotenv } from "dotenv";
 
 import app from "./app";
-import UauCustomerController from "./Controllers/uau/uau.costumer.controller";
-import uau from "./Lib/Uau";
-import UauSyncWorker from "./Workers/Sync/uau.worker.sync";
 
 configDotenv();
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT!;
+const HOST = process.env.HOST!;
 
 app.listen(PORT, async () => {
 
   console.log("Servidor iniciado.");
-  console.log(`Servidor rodando em http://localhost:${PORT}.`);
-
-
-  const sync = new UauSyncWorker()
-  await sync.rescueErpCostumers()
-
-
-
-  // const data = await controller.findAdressCostumer(18808)
-  /* const data = await controller.deletePhoneCostumer(28002, [
-    {
-      DDD: '031',
-      telefone: "96949766",
-      Complemento: "whatsapp",
-      Principal: 1,
-      Tipo: 0
-    },
-    {
-      DDD: '031',
-      telefone: "32720333",
-      Complemento: "fixo",
-      Principal: 0,
-      Tipo: 1
-    },
-    {
-      DDD: '031',
-      telefone: "989062492",
-      Complemento: "corporativo",
-      Principal: 1,
-      Tipo: 2
-    }
-  ]) */
-  /*   const data = await controller.recordPhoneCostumer(28002, [
-      {
-        DDD: '031',
-        telefone: "96949766",
-        Complemento: "whatsapp",
-        Principal: 1,
-        Tipo: 0
-      },
-      {
-        DDD: '031',
-        telefone: "32720333",
-        Complemento: "fixo",
-        Principal: 0,
-        Tipo: 1
-      },
-      {
-        DDD: '031',
-        telefone: "989062492",
-        Complemento: "corporativo",
-        Principal: 1,
-        Tipo: 2
-      }
-    ]) */
-
-
+  console.log(`Servidor rodando em http://${HOST}:${PORT}.`);
 
 });

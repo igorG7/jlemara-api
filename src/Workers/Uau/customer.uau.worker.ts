@@ -1,21 +1,36 @@
-import Console from "../../Lib/Console";
-import UauCustomerService from "../../Services/Uau/uau.costumer.service";
-import { CustomersWithSale } from "../../Services/Uau/uau.customer.dto";
-import { AddressType, CustomerType } from "Types/CostumerTypes";
+//src\Workers\Uau\customer.uau.worker.ts
+import Console, { ConsoleData } from "../../Lib/Console";
+import { CustomersWithSale } from "../../Services/Uau/Customer/uau.customer.dto";
+import { AddressType, CustomerType } from "Types/CustomerTypes";
 import parseBRDate from "../../Utils/dateParser";
-import CostumerController from "../../Controllers/costumer.controller";
-import RedisController from "../../Controllers/redis.controller";
+import CustomerController from "../../Controllers/customer.controller";
+import mountCustomerAdress from "./mountCustomerAdress";
+import UauCustomerService from "Services/Uau/Customer/uau.costumer.service";
 
-export default class UauSyncWorker {
+
+export default class CustomerUauWorker {
   private customerUauService = new UauCustomerService();
-  private customerController = new CostumerController();
-  private redisController = new RedisController();
+  private customerController = new CustomerController();
+  private isRunning = false
 
-  /**
-   * Sincroniza clientes do ERP para o Banco de Dados local usando concorrência
-   */
-  async rescueErpCostumers() {
-    console.time("⏳ tempo_total ⏳");
+  async start() {
+    if (this.isRunning) return
+    try {
+      this.isRunning = true
+      await this.rescueErpCustomers()
+      this.isRunning = false
+      return
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Problemas na inicialização do worker etl"
+      Console({ type: "error", message });
+      ConsoleData({ type: "error", data: error })
+      return
+    }
+  }
+
+  private async rescueErpCustomers() {
+    console.time("⏳ tempo total worker ⏳");
+
     Console({ type: "log", message: "Iniciando verificação em lote no ERP UAU." });
 
     try {
@@ -27,84 +42,78 @@ export default class UauSyncWorker {
       }
 
       const totalItems = customersWithSale.length;
+
       Console({ type: "log", message: `${totalItems} clientes identificados no ERP.` });
 
       let saved = 0;
       let errorCount = 0;
 
       // --- CONFIGURAÇÃO DE LOTE (CHUNKS) ---
-      const CHUNK_SIZE = 10; // Processa 10 clientes por vez em paralelo
-      const dataToProcess = customersWithSale;
+      const CHUNK_SIZE = 10; // Processa CHUNK_SIZE clientes por vez em paralelo
+
+      const dataToProcess = customersWithSale // utilizado para testes com um .slice(x, y)
 
       for (let i = 0; i < dataToProcess.length; i += CHUNK_SIZE) {
+
+        // [clientes atual] = chunk
         const chunk = dataToProcess.slice(i, i + CHUNK_SIZE);
 
         Console({ type: "log", message: `Processando lote: ${i} até ${i + CHUNK_SIZE} de ${totalItems}...` });
-
-        // Executa o lote atual em paralelo
-        // ... dentro do rescueErpCostumers no Promise.all
 
         await Promise.all(
           chunk.map(async (item) => {
             try {
               if (!item.Cod_pes) return;
 
-              // REMOVEMOS o Promise.all interno para evitar o conflito de lock no mesmo ID
-              // Agora as chamadas internas respeitam a ordem, mas o lote continua paralelo entre IDs diferentes
-              const detail = await this.customerUauService.findCostumerWithCode(item.Cod_pes);
+              const detail = await this.customerUauService.findCustomerWithCode(item.Cod_pes);
               if (!detail) return;
 
               const phones = await this.customerUauService.findPhonesCustomer(item.Cod_pes);
-              const address = await this.customerUauService.findAdressCostumer(item.Cod_pes);
+
+              const address = await this.customerUauService.findAdressCustomer(item.Cod_pes);
 
               const fullData = { ...detail, phones, address };
+
               await this.formatCustomerAndSave(fullData);
 
               saved++;
             } catch (error) {
               errorCount++;
-              // Log discreto para não poluir
+              const message = error instanceof Error ? error.message : "Problemas no processamento do cliente " + item.Cod_pes
+              Console({ type: "error", message })
             }
           })
         );
+        await new Promise(resolve => setTimeout(resolve, 1000)); // respiro para a api uau de 1s
       }
 
       Console({ type: "success", message: `Sincronismo finalizado: ${saved} salvos, ${errorCount} falhas.` });
-      console.timeEnd("⏳ tempo_total ⏳");
+
+      console.timeEnd("⏳ tempo total worker ⏳");
 
     } catch (error) {
+
+      const message = error instanceof Error ? error.message : "Problemas no processamento worker uau customer "
       Console({ type: "error", message: "Falha crítica no Worker de Sincronismo." });
-      console.error(error);
+      Console({ type: "error", message })
     }
   }
 
-  /**
-   * Mapeia os dados brutos do UAU para o padrão do Sistema Local
-   */
   private async formatCustomerAndSave(customer: any) {
     if (!customer || !customer.cpf_pes) {
       throw new Error("CPF ausente.");
     }
 
-    await this.redisController.removeCustomerLock(customer.cpf_pes);
-
     try {
       const addressRaw = customer.address?.[0] || {};
+
       const phonesRaw = (customer.phones || []) as Array<{ Telefone: string; DDD: string }>;
 
       const phone_numbers = phonesRaw.map(
-        (p) => `${p.DDD}${String(p.Telefone).replace(/[-\s]/g, "")}`
+        (p) => `${p.DDD}${String(p.Telefone).replace(/[-\s]/g, "")} `
       );
 
-      const address_person: AddressType = {
-        street: addressRaw.Endereco_pend || "",
-        city: addressRaw.Cidade_pend || "",
-        country: "Brasil",
-        district: addressRaw.Bairro_pend || "",
-        number: addressRaw.numEnd_pend || "S/N",
-        state: addressRaw.UF_pend || "",
-        zip_code: addressRaw.CEP_pend || ""
-      };
+      const address_person: AddressType = mountCustomerAdress(addressRaw)
 
       const type_person = Number(customer.tipo_pes) === 0 ? "PF" : "PJ";
 
@@ -124,9 +133,13 @@ export default class UauSyncWorker {
         status: customer.Status_pes
       };
 
+
       await this.customerController.register(formatted);
+
     } catch (error) {
       throw error;
     }
   }
+
+
 }

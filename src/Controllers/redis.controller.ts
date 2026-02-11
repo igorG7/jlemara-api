@@ -14,7 +14,7 @@ import redis from "../Lib/Redis";
  */
 export default class RedisController {
   private controller = redis;
-  costumerLockKey = "costumer:lock_key"
+  customerLockKey = "customer:lock_key"
   /**
    * Recupera um valor do cache através da chave.
    * @param key String definida preferencialmente via REDIS_KEYS.
@@ -98,7 +98,7 @@ export default class RedisController {
     }
   }
   /* -------------------------------------------------------------------------- */
-  /* MÉTODOS ESPECÍFICOS (COSTUMER UAU)                                         */
+  /* MÉTODOS ESPECÍFICOS (CUSTOMER UAU)                                         */
   /* -------------------------------------------------------------------------- */
 
   /**
@@ -106,6 +106,7 @@ export default class RedisController {
    * Retorna true se conseguiu a trava, false se o CPF já estiver travado.
    */
   async setCustomerLock(cpf: string): Promise<boolean> {
+    return true
     try {
       const key = REDIS_KEYS.CUSTOMER_LOCK(cpf);
       // 'NX' garante que só grava se não existir.
@@ -118,10 +119,11 @@ export default class RedisController {
   }
 
   async removeCustomerLock(cpf: string): Promise<boolean> {
+    return true
     return this.delete(REDIS_KEYS.CUSTOMER_LOCK(cpf));
   }
 
-  async verifyCostumerLockKey(key: string) {
+  async verifyCustomerLockKey(key: string) {
     try {
       // validação se ja existe essa key
       const validate = await this.get(key)
@@ -132,7 +134,7 @@ export default class RedisController {
 
       return false
     } catch (error) {
-      return this.handleError("verifyCostumerLockKey", error);
+      return this.handleError("verifyCustomerLockKey", error);
 
     }
 

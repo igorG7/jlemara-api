@@ -20,7 +20,7 @@ const redis = new RedisController();
 // Instância base do Axios para o UAU
 const uau: AxiosInstance = axios.create({
   baseURL: process.env.UAU_API_DEV!,
-  timeout: 30000, // 30 segundos timeout
+  timeout: 45000, // segundos timeout
   headers: {
     Accept: "application/json",
     "Content-Type": "application/json",
