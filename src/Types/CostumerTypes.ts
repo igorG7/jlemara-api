@@ -14,7 +14,7 @@ export interface CustomerType {
   // _id?: string;
   code_person: number;
   full_name: string;
-  birth_date: Date;
+  birth_date: Date | null;
   status: number;
   email: string;
   type_person: PersonType;

@@ -2,9 +2,10 @@ import uau from "../../Lib/Uau";
 
 import RedisController from "../../Controllers/redis.controller"
 
-import { RecordPhoneCustomerDTO, RecordCustomerDTO, ResponseCustomerPhones, DeleteCustomerPhones, ResponseFindCustomerWithPersonCode, ResponseFindCustomerWithCPF, CustomerWithCodeOrCPF, ResponseCustomerFindUnits, CustomerAddress, ResponseCustomerFindAdress } from "./uau.customer.dto";
+import { RecordPhoneCustomerDTO, RecordCustomerDTO, ResponseCustomerPhones, DeleteCustomerPhones, ResponseFindCustomerWithPersonCode, ResponseFindCustomerWithCPF, CustomerWithCodeOrCPF, ResponseCustomerFindUnits, CustomerAddress, ResponseCustomerFindAdress, CustomersWithSale, ResponseFindCustomersWithSale } from "./uau.customer.dto";
 import Console, { ConsoleData } from "../../Lib/Console";
 import parseBRDate from "../../Utils/dateParser";
+import { costumerValidateCodPes, costumerValidateCPF } from "./uau.customer.validation";
 
 export default class UauCustomerService {
   private redis = new RedisController();
@@ -13,12 +14,15 @@ export default class UauCustomerService {
   // ✅ - VALIDADO
   async recordCustomer(payload: RecordCustomerDTO) {
     const cpf = String(payload.cpf_person).replace(/\D/g, "")
-    if (!cpf) throw new Error("CPF é obrigatório para o cadastro.");
+
+    await costumerValidateCPF(cpf)
+
     try {
       const lockAcquired = await this.redis.setCustomerLock(cpf);
       if (!lockAcquired) {
         throw new Error(`O cadastro do CPF ${cpf} já está em processamento.`);
       }
+
       let formattedDate = parseBRDate(String(payload?.birth_date));
 
       // Ponto de atenção: Infelizmente, as vezes a api uau coloca como obrigatorio enviar essas informações
@@ -81,7 +85,9 @@ export default class UauCustomerService {
 
   // ✅ - VALIDADO
   async recordPhoneCustomer(cod_pes: number, phones: RecordPhoneCustomerDTO[]) {
-    if (!cod_pes) throw new Error("cod_pes é obrigatório para o cadastro.");
+
+    await costumerValidateCodPes(cod_pes)
+
     try {
       const lockAcquired = await this.redis.setCustomerLock(String(cod_pes));
       if (!lockAcquired) {
@@ -115,7 +121,7 @@ export default class UauCustomerService {
 
   // ✅ - VALIDADO
   async findPhonesCustomer(cod_pes: number) {
-    if (!cod_pes) throw new Error("cod_pes é obrigatório para o cadastro.");
+    await costumerValidateCodPes(cod_pes)
     try {
       const lockAcquired = await this.redis.setCustomerLock(String(cod_pes));
       if (!lockAcquired) {
@@ -140,7 +146,7 @@ export default class UauCustomerService {
 
   // ✅ - VALIDADO
   async deletePhoneCostumer(cod_pes: number, phones: DeleteCustomerPhones[]) {
-    if (!cod_pes) throw new Error("cod_pes é obrigatório para o cadastro.");
+    await costumerValidateCodPes(cod_pes)
     try {
       const lockAcquired = await this.redis.setCustomerLock(String(cod_pes));
       if (!lockAcquired) {
@@ -165,7 +171,7 @@ export default class UauCustomerService {
 
   // ✅ - VALIDADO
   async findCostumerWithCode(cod_pes: number) {
-    if (!cod_pes) throw new Error("cod_pes é obrigatório para o cadastro.");
+    await costumerValidateCodPes(cod_pes)
     try {
       const lockAcquired = await this.redis.setCustomerLock(String(cod_pes));
       if (!lockAcquired) {
@@ -189,11 +195,28 @@ export default class UauCustomerService {
     }
   }
 
+
+  async findCustomersWithSale() {
+    try {
+
+      const body = {}
+      const data = await this.api.post("Pessoas/ConsultarPessoasComVenda", body) as ResponseFindCustomersWithSale
+      const res = data[0].Pessoas.slice(1, data[0].Pessoas.length) as CustomersWithSale[]
+      Console({ type: "success", message: `UAU: Clientes com venda encontrados com sucesso.` });
+      return res
+
+    } catch (error: any) {
+      const message = error.response?.data?.message || error.message;
+      Console({ type: "error", message: `findCustomersWithSale: ${message}` });
+      console.log(error.response.data)
+      throw new Error(message);
+    }
+  }
+
   // ✅ - VALIDADO
   async findCostumerWithCPF(cpf_cnpj: string, status: number = 0) {
 
-    if (!cpf_cnpj) throw new Error("cpf_cnpj é obrigatório para o cadastro.");
-
+    await costumerValidateCPF(cpf_cnpj)
     try {
       const lockAcquired = await this.redis.setCustomerLock(String(cpf_cnpj));
       if (!lockAcquired) {
@@ -226,7 +249,7 @@ export default class UauCustomerService {
 
   // ✅ - VALIDADO
   async findUnitsCustomer(cod_pes: number) {
-    if (!cod_pes) throw new Error("cod_pes é obrigatório para o cadastro.");
+    await costumerValidateCodPes(cod_pes)
     try {
       const lockAcquired = await this.redis.setCustomerLock(String(cod_pes));
       if (!lockAcquired) {
@@ -251,7 +274,7 @@ export default class UauCustomerService {
 
   // ✅ - VALIDADO
   async findAdressCostumer(cod_pes: number, tipoEndereco: number = 0) {
-    if (!cod_pes) throw new Error("cod_pes é obrigatório para a consulta.");
+    await costumerValidateCodPes(cod_pes)
     try {
       const lockAcquired = await this.redis.setCustomerLock(String(cod_pes));
       if (!lockAcquired) {

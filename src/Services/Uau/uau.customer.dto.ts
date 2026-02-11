@@ -47,6 +47,18 @@ export type ResponseFindCustomerWithCPF = [
     Pessoas: CustomerWithCodeOrCPF[]
   }
 ];
+export type ResponseFindCustomersWithSale = [
+  {
+    Pessoas: CustomersWithSale[]
+  }
+];
+
+export type CustomersWithSale = {
+  Cod_pes: number,
+  Nome_pes: string,
+  NomeFant_Pes: string,
+}
+
 export type DeleteCustomerPhones = {
   telefone: string;
   DDD: string;

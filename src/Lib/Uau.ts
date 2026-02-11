@@ -58,7 +58,6 @@ uau.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
 
 
       token = response.data
-      ConsoleData({ type: "error", data: response })
 
       // 3. Persiste o novo token no Redis para uso das outras instâncias do Cluster
       await redis.setUauToken(String(token));

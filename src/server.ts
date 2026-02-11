@@ -3,6 +3,7 @@ import { configDotenv } from "dotenv";
 import app from "./app";
 import UauCustomerController from "./Controllers/uau/uau.costumer.controller";
 import uau from "./Lib/Uau";
+import UauSyncWorker from "./Workers/Sync/uau.worker.sync";
 
 configDotenv();
 
@@ -13,7 +14,12 @@ app.listen(PORT, async () => {
   console.log("Servidor iniciado.");
   console.log(`Servidor rodando em http://localhost:${PORT}.`);
 
-  const controller = new UauCustomerController()
+
+  const sync = new UauSyncWorker()
+  await sync.rescueErpCostumers()
+
+
+
   // const data = await controller.findAdressCostumer(18808)
   /* const data = await controller.deletePhoneCostumer(28002, [
     {
