@@ -3,6 +3,7 @@ import Console from "../Lib/Console";
 import Customer from "../Models/Costumer";
 
 import { CustomerType } from "../Types/CostumerTypes";
+import { notEqual } from "assert";
 
 const notReturn = {
   password: 0,
@@ -215,9 +216,20 @@ class CostumerController {
 
   async listAll(req: Request, res: Response) {
     try {
+      const page = Number(req.query.page) || 1;
+      const customersPerPage = Number(req.query.number) || 5;
+
       Console({ type: "log", message: "Buscando todos os clientes." });
 
-      const customers = await Customer.find({}, { ...notReturn }).lean();
+      const customers = await Customer.find(
+        {},
+        { ...notReturn },
+        {
+          sort: { full_name: 1 },
+          limit: customersPerPage,
+          skip: (page - 1) * customersPerPage,
+        },
+      ).lean();
 
       if (!customers.length) {
         Console({ type: "warn", message: "Nenhum cliente encontrado." });
@@ -243,11 +255,19 @@ class CostumerController {
 
   async listAllActiveCustomers(req: Request, res: Response) {
     try {
+      const page = Number(req.query.page) || 1;
+      const customersPerPage = Number(req.query.number) || 5;
+
       Console({ type: "log", message: "Buscando clientes ativos." });
 
       const customers = await Customer.find(
         { status: 1 },
         { ...notReturn },
+        {
+          sort: { full_name: 1 },
+          limit: customersPerPage,
+          skip: (page - 1) * customersPerPage,
+        },
       ).lean();
 
       if (!customers.length) {
