@@ -4,7 +4,7 @@ import { CustomersWithSale } from "../../Services/Uau/Customer/uau.customer.dto"
 import { AddressType, CustomerType } from "Types/CustomerTypes";
 import parseBRDate from "../../Utils/dateParser";
 import CustomerController from "../../Controllers/customer.controller";
-import mountCustomerAdress from "./mountCustomerAdress";
+import mountCustomerAdress from "./utils/mountCustomerAdress";
 import UauCustomerService from "Services/Uau/Customer/uau.costumer.service";
 
 
