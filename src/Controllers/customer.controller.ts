@@ -1,6 +1,7 @@
 import { Request, response, Response } from "express";
 import Console from "../Lib/Console";
-import Customer from "../Models/Costumer";
+import Customer from "../Models/Customer";
+import { CustomerType } from "Types/CustomerTypes";
 
 const notReturn = {
   password: 0,
@@ -8,8 +9,8 @@ const notReturn = {
   updatedAt: 0,
 };
 
-class CostumerController {
-  async register(data: any) {
+class CustomerController {
+  async register(data: CustomerType) {
     const key = data.code_person;
 
     const customer = await Customer.findOneAndUpdate(
@@ -189,4 +190,4 @@ class CostumerController {
   }
 }
 
-export default new CostumerController();
+export default CustomerController
