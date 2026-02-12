@@ -8,8 +8,8 @@ import { validateCustomerUpdate } from "../Middlewares/Costumer/validateCustomer
 const routes = Router();
 
 routes.post("/create", Customer.createClient); // * Temporario
-routes.get("/find", validateFindCustomer, Customer.findCustomer);
-routes.get("/find/name", Customer.findCustomerByPartialName);
+routes.post("/search", validateFindCustomer, Customer.findCustomer);
+routes.post("/search/name", Customer.findCustomerByPartialName);
 routes.get("/page/:page/number/:number", Customer.listAll);
 routes.get(
   "/actives/page/:page/number/:number",
