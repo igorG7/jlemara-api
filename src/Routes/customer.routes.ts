@@ -10,8 +10,11 @@ const routes = Router();
 routes.post("/create", Customer.createClient); // * Temporario
 routes.get("/find", validateFindCustomer, Customer.findCustomer);
 routes.get("/find/name", Customer.findCustomerByPartialName);
-routes.get("/", Customer.listAll);
-routes.get("/actives", Customer.listAllActiveCustomers);
+routes.get("/page/:page/number/:number", Customer.listAll);
+routes.get(
+  "/actives/page/:page/number/:number",
+  Customer.listAllActiveCustomers,
+);
 routes.patch("/update", validateCustomerUpdate, Customer.updateCustomer);
 
 export default routes;
