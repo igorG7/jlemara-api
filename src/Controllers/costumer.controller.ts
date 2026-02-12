@@ -3,7 +3,6 @@ import Console from "../Lib/Console";
 import Customer from "../Models/Costumer";
 
 import { CustomerType } from "../Types/CostumerTypes";
-import { notEqual } from "assert";
 
 const notReturn = {
   password: 0,
