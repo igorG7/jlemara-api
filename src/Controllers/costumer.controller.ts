@@ -177,7 +177,7 @@ class CostumerController {
 
   async findCustomerByPartialName(req: Request, res: Response) {
     try {
-      const { name } = req.body;
+      const name = req.params.name;
       Console({ type: "log", message: "Buscando clientes" });
 
       const customers = await Customer.find(
