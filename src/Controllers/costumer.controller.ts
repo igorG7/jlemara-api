@@ -322,6 +322,98 @@ class CostumerController {
         .json({ message: "Erro interno inesperado.", error });
     }
   }
+
+  async findManyAddressCustomer(req: Request, res: Response) {
+    try {
+      const { codes }: { codes: string[] | number[] } = req.body;
+
+      Console({
+        type: "log",
+        message: "Customer: Buscando endereço dos clientes.",
+      });
+
+      const customers = await Customer.find(
+        { code_person: { $in: codes } },
+        { code_person: 1, full_name: 1, address_person: 1 },
+      ).lean();
+
+      if (!customers.length) {
+        Console({
+          type: "error",
+          message:
+            "Customer: Nenhum cliente encontrado. | Origem: 'findAddressCustomer'",
+        });
+        return res.status(404).json({
+          message: "Nenhum cliente encontrado",
+          error: null,
+          data: [],
+        });
+      }
+
+      Console({
+        type: "success",
+        message: "Customer: Busca por endereços concluída.",
+      });
+
+      return res.status(200).json({
+        message: "Busca por endereços concluída.",
+        data: customers,
+      });
+    } catch (error) {
+      Console({
+        type: "error",
+        message: "Customer: Erro interno inesperado.",
+      });
+      return res
+        .status(500)
+        .json({ message: "Erro interno inesperado.", error });
+    }
+  }
+
+  async findAddressCustomer(req: Request, res: Response) {
+    try {
+      const code_person = req.params.code_person;
+
+      Console({
+        type: "log",
+        message: "Customer: Buscando endereço do cliente.",
+      });
+
+      const customer = await Customer.findOne(
+        { code_person },
+        { address_person: 1, full_name: 1 },
+      ).lean();
+
+      if (!customer) {
+        Console({
+          type: "error",
+          message:
+            "Customer: Cliente não encontrado. | Origem: 'findAddressCustomer'",
+        });
+        return res
+          .status(404)
+          .json({ message: "Cliente não encontrado", error: null });
+      }
+
+      Console({
+        type: "success",
+        message: "Customer: Busca por endereço concluída.",
+      });
+
+      return res.status(200).json({
+        message: "Busca por endereço concluída.",
+        data: customer,
+      });
+    } catch (error) {
+      Console({
+        type: "error",
+        message: "Customer: Erro interno inesperado.",
+      });
+      return res
+        .status(500)
+        .json({ message: "Erro interno inesperado.", error });
+    }
+  }
 }
 
 export default new CostumerController();
