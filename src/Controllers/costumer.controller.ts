@@ -3,6 +3,7 @@ import Console from "../Lib/Console";
 import Customer from "../Models/Costumer";
 
 import { CustomerType } from "../Types/CostumerTypes";
+import { error } from "console";
 
 const notReturn = {
   password: 0,
@@ -317,6 +318,45 @@ class CostumerController {
       });
     } catch (error) {
       Console({ type: "error", message: "Erro interno inesperado." });
+      return res
+        .status(500)
+        .json({ message: "Erro interno inesperado.", error });
+    }
+  }
+
+  async updatePhoneCustomer(req: Request, res: Response) {
+    try {
+      const { id, phone_number } = req.body;
+
+      Console({ type: "log", message: "Atualizando telefone do cliente." });
+
+      const customerUpdated = await Customer.findByIdAndUpdate(
+        id,
+        {
+          $set: { "phone_numbers.0": phone_number },
+          updatedAt: new Date(),
+        },
+        { new: true, select: { ...notReturn } },
+      );
+
+      if (!customerUpdated) {
+        Console({ type: "error", message: "Cliente não encontrado" });
+        return res
+          .status(404)
+          .json({ message: "Cliente não encontrado", error: null });
+      }
+
+      Console({ type: "success", message: "Telefone atualizado com sucesso." });
+
+      return res.status(200).json({
+        message: "Telefone atualizado com sucesso.",
+        data: customerUpdated,
+      });
+    } catch (error) {
+      Console({
+        type: "error",
+        message: "Customer: Erro interno inesperado.",
+      });
       return res
         .status(500)
         .json({ message: "Erro interno inesperado.", error });
