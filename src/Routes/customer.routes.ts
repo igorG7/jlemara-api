@@ -13,17 +13,18 @@ routes.post("/create", Customer.createClient); // * Temporario
 
 // Rotas de busca (GET)
 routes.get("/page/:page/number/:number", Customer.listAll);
+
+routes.get(
+  "/actives/page/:page/number/:number",
+  Customer.listAllActiveCustomers,
+);
+
 routes.get("/search/:name", Customer.findCustomerByPartialName);
 
 routes.get(
   "/address/:code_person",
   validateFindAddress,
   Customer.findAddressCustomer,
-);
-
-routes.get(
-  "/actives/page/:page/number/:number",
-  Customer.listAllActiveCustomers,
 );
 
 // Rotas de busca que utlizam filtros mais detalhadas (POST).
