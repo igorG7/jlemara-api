@@ -6,6 +6,7 @@ import { validateFindCustomer } from "../Middlewares/Costumer/validateFindCustom
 import { validateCustomerUpdate } from "../Middlewares/Costumer/validateCustomerUpdate";
 import { validateFindAddress } from "../Middlewares/Costumer/validateFindAddress";
 import { validateFindManyAddress } from "../Middlewares/Costumer/validateFindManyAddress";
+import { validateCustomerPhoneUpdate } from "../Middlewares/Costumer/validateCustomerUpdatePhone";
 
 const routes = Router();
 
@@ -38,7 +39,11 @@ routes.post(
 );
 
 // Rotas de atualização (PUT/PATCH)
-
 routes.patch("/update", validateCustomerUpdate, Customer.updateCustomer);
+routes.patch(
+  "/update/phone",
+  validateCustomerPhoneUpdate,
+  Customer.updatePhoneCustomer,
+);
 
 export default routes;
