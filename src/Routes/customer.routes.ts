@@ -13,6 +13,7 @@ routes.post("/create", Customer.createClient); // * Temporario
 
 // Rotas de busca (GET)
 routes.get("/page/:page/number/:number", Customer.listAll);
+routes.get("/search/:name", Customer.findCustomerByPartialName);
 
 routes.get(
   "/address/:code_person",
@@ -28,7 +29,6 @@ routes.get(
 // Rotas de busca que utlizam filtros mais detalhadas (POST).
 // A utilização de POST de faz necessária para um envio de dados mais complexo para realizar a busca.
 routes.post("/search", validateFindCustomer, Customer.findCustomer);
-routes.post("/search/name", Customer.findCustomerByPartialName);
 
 routes.post(
   "/addres",
