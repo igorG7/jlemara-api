@@ -20,7 +20,7 @@ const redis = new RedisController();
 // Instância base do Axios para o UAU
 const uau: AxiosInstance = axios.create({
   baseURL: process.env.UAU_API_DEV!,
-  timeout: 30000, // 30 segundos timeout
+  timeout: 45000, // segundos timeout
   headers: {
     Accept: "application/json",
     "Content-Type": "application/json",
@@ -58,7 +58,6 @@ uau.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
 
 
       token = response.data
-      ConsoleData({ type: "error", data: response })
 
       // 3. Persiste o novo token no Redis para uso das outras instâncias do Cluster
       await redis.setUauToken(String(token));

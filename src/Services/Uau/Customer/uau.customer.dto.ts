@@ -1,13 +1,4 @@
 
-
-export type RecordCustomerDTO = {
-  cpf_person: string;
-  birth_date: Date | string;
-  full_name: string;
-  type_person: string;
-  email: string;
-  dspes_tel_json: RecordPhoneCustomerDTO[]
-};
 export type RecordPhoneCustomerDTO = {
   ddd_tel: string;
   fone_tel: string;
@@ -47,13 +38,25 @@ export type ResponseFindCustomerWithCPF = [
     Pessoas: CustomerWithCodeOrCPF[]
   }
 ];
-export type DeleteCustomerPhones = {
-  telefone: string;
-  DDD: string;
-  Complemento?: string;
-  Tipo?: number;
-  Principal?: number;
+export type ResponseFindCustomersWithSale = [
+  {
+    Pessoas: CustomersWithSale[]
+  }
+];
+
+export type RecordCustomerDTO = {
+  cpf_person: string;
+  birth_date: Date | string;
+  full_name: string;
+  type_person: string;
+  email: string;
+  dspes_tel_json: RecordPhoneCustomerDTO[]
 };
+export type CustomersWithSale = {
+  Cod_pes: number,
+  Nome_pes: string,
+  NomeFant_Pes: string,
+}
 export type CustomerWithCodeOrCPF = {
   cod_pes: number;
   nome_pes: string;
@@ -108,4 +111,13 @@ export type CustomerAddress = {
   CodEmp_pend: string | 'null';
   NomeEmp_pend: string | 'null';
   TipoEndEmp_pend: string | 'null';
+};
+
+
+export type DeleteCustomerPhones = {
+  telefone: string;
+  DDD: string;
+  Complemento?: string;
+  Tipo?: number;
+  Principal?: number;
 };

@@ -8,7 +8,7 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "lint": "eslint \"src/**/*.ts\"",
-    "etl": "ts-node-dev --transpile-only src/scripts/seed-chats.ts"
+    "etl": "ts-node -r  ./src/Workers/run.ts"
   },
   "keywords": [],
   "author": "",
@@ -25,7 +25,8 @@
     "form-data": "^4.0.5",
     "ioredis": "^5.9.2",
     "jsonwebtoken": "^9.0.3",
-    "mongoose": "^9.0.1"
+    "mongoose": "^9.0.1",
+    "node-cron": "^4.2.1"
   },
   "devDependencies": {
     "@types/cookie-parser": "^1.4.10",
@@ -33,6 +34,7 @@
     "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^24.10.1",
+    "@types/node-cron": "^3.0.11",
     "@typescript-eslint/eslint-plugin": "^8.48.1",
     "@typescript-eslint/parser": "^8.48.1",
     "eslint": "^9.39.1",

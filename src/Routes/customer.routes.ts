@@ -1,15 +1,14 @@
 import { Router } from "express";
 
-import Customer from "../Controllers/costumer.controller";
+import Customer from "../Controllers/customer.controller";
 
-import { validateFindCustomer } from "../Middlewares/Costumer/validateFindCustomer";
-import { validateCustomerUpdate } from "../Middlewares/Costumer/validateCustomerUpdate";
-import { validateFindAddress } from "../Middlewares/Costumer/validateFindAddress";
-import { validateFindManyAddress } from "../Middlewares/Costumer/validateFindManyAddress";
-import { validateCustomerPhoneUpdate } from "../Middlewares/Costumer/validateCustomerUpdatePhone";
+import { validateFindCustomer } from "../Middlewares/Customer/validateFindCustomer";
+import { validateCustomerUpdate } from "../Middlewares/Customer/validateCustomerUpdate";
+import { validateFindAddress } from "../Middlewares/Customer/validateFindAddress";
+import { validateFindManyAddress } from "../Middlewares/Customer/validateFindManyAddress";
+import { validateCustomerPhoneUpdate } from "../Middlewares/Customer/validateCustomerUpdatePhone";
 
 const routes = Router();
-
 routes.post("/create", Customer.createClient); // * Temporario
 
 // Rotas de busca (GET)

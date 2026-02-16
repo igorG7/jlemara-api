@@ -1,5 +1,5 @@
-import Console from "../../Lib/Console";
-import uau from "../../Lib/Uau";
+import Console from "../../../Lib/Console";
+import uau from "../../../Lib/Uau";
 import { ResponseFindAllUnidades } from "./uau.unidade.types";
 
 export default class UauUnidadeService {
@@ -59,7 +59,15 @@ export default class UauUnidadeService {
 
   }
 
-  async changeStatusUnidade(product: number, cod_peson: number, new_status: number, reasonForChange: string, categoriaStatusPersonalizacao: number) {
+
+
+}
+
+
+
+/*
+
+async changeStatusUnidade(product: number, cod_peson: number, new_status: number, reasonForChange: string, categoriaStatusPersonalizacao: number) {
 
     Console({ type: "log", message: "Buscando unidades cadastradas " });
 
@@ -86,5 +94,5 @@ export default class UauUnidadeService {
     }
   }
 
-}
 
+  */

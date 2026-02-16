@@ -1,9 +1,7 @@
 import { Request, Response } from "express";
 import Console from "../Lib/Console";
-import Customer from "../Models/Costumer";
-
-import { CustomerType } from "../Types/CostumerTypes";
-import { error } from "console";
+import Customer from "../Models/Customer";
+import { CustomerType } from "../Types/CustomerTypes";
 
 const notReturn = {
   password: 0,
@@ -11,7 +9,7 @@ const notReturn = {
   updatedAt: 0,
 };
 
-class CostumerController {
+class CustomerController {
   async registerCustomer(data: CustomerType) {
     try {
       if (!data) {
@@ -456,4 +454,4 @@ class CostumerController {
   }
 }
 
-export default new CostumerController();
+export default new CustomerController();

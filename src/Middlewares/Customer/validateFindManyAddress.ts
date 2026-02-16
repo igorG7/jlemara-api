@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from "express";
 import Console from "../../Lib/Console";
-import Customer from "Models/Costumer";
 
 /**
  * Middleware responsável por validar a chave enviada na busca de endereços de um grupo de clientes.
