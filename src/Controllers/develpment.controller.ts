@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 
 import Development from "../Models/Development";
 import Console from "../Lib/Console";
+import { error } from "console";
 
 class DevelopmentController {
   async createTemp(req: Request, res: Response) {
@@ -40,6 +41,34 @@ class DevelopmentController {
       return res
         .status(200)
         .json({ message: "Busca por obras concluída.", data: developments });
+    } catch (error) {
+      Console({ type: "error", message: "Erro interno inesperado." });
+      return res
+        .status(500)
+        .json({ message: "Erro interno inesperado.", error });
+    }
+  }
+
+  async findDevelopment(req: Request, res: Response) {
+    try {
+      const query = req.body;
+
+      Console({ type: "log", message: "Buscando obra." });
+
+      const development = await Development.findOne(query).lean();
+
+      if (!development) {
+        Console({ type: "error", message: "Obra não encontrada." });
+        return res
+          .status(404)
+          .json({ message: "Obra não encotrada.", error: null });
+      }
+
+      Console({ type: "success", message: "Busca por obra concluída." });
+
+      return res
+        .status(200)
+        .json({ message: "Busca por obra concluída.", data: development });
     } catch (error) {
       Console({ type: "error", message: "Erro interno inesperado." });
       return res
