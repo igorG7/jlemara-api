@@ -76,6 +76,45 @@ class DevelopmentController {
         .json({ message: "Erro interno inesperado.", error });
     }
   }
+
+  async findPublics(req: Request, res: Response) {
+    try {
+      const page = Number(req.params.page) || 1;
+
+      Console({ type: "log", message: "Buscando obras públicas." });
+
+      const developments = await Development.find(
+        { is_public: true },
+        {},
+        { limit: 5, skip: (page - 1) * 5 },
+      ).lean();
+
+      if (!developments.length) {
+        Console({ type: "warn", message: "Nenhuma obra pública encontrada." });
+
+        return res.status(404).json({
+          message: "Nenhuma obra pública encontrada.",
+          error: null,
+          data: [],
+        });
+      }
+
+      Console({
+        type: "success",
+        message: "Busca por obras públicas concluída.",
+      });
+
+      return res.status(200).json({
+        message: "Busca por obras públicas concluída.",
+        data: developments,
+      });
+    } catch (error) {
+      Console({ type: "error", message: "Erro interno inesperado." });
+      return res
+        .status(500)
+        .json({ message: "Erro interno inesperado.", error });
+    }
+  }
 }
 
 export default new DevelopmentController();
