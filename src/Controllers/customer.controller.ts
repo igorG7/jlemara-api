@@ -1,7 +1,7 @@
-import { Request, response, Response } from "express";
+import { Request, Response } from "express";
 import Console from "../Lib/Console";
 import Customer from "../Models/Customer";
-import { CustomerType } from "Types/CustomerTypes";
+import { CustomerType } from "../Types/CustomerTypes";
 
 const notReturn = {
   password: 0,
@@ -10,16 +10,130 @@ const notReturn = {
 };
 
 class CustomerController {
-  async register(data: CustomerType) {
-    const key = data.code_person;
+  async registerCustomer(data: CustomerType) {
+    try {
+      if (!data) {
+        Console({ type: "error", message: "Data vazio." });
+        return {
+          error: null,
+          message: "Data vazio.",
+          data: null,
+        };
+      }
 
-    const customer = await Customer.findOneAndUpdate(
-      { code_person: key },
-      { ...data },
-      { upsert: true, new: true },
-    );
+      const { code_person } = data;
 
-    return customer;
+      Console({
+        type: "log",
+        message: `Cadastrando/atualizando cliente ${code_person}...`,
+      });
+
+      const customer = await Customer.findOneAndUpdate(
+        { code_person },
+        { ...data },
+        { upsert: true, new: true, select: { ...notReturn } },
+      ).lean();
+
+      Console({
+        type: "success",
+        message: "Cliente cadastrado/atualizado com sucesso!",
+      });
+
+      return {
+        message: "Cliente cadastrado/atualizado com sucesso!",
+        data: customer,
+      };
+    } catch (error) {
+      Console({
+        type: "error",
+        message: "Erro ao cadastrar/atualizar cliente.",
+      });
+
+      return {
+        message: "Erro ao cadastrar/atualizar cliente.",
+        error,
+        data: null,
+      };
+    }
+  }
+
+  async registerBatchesCustomer(data: any[]) {
+    try {
+      if (!data || !data.length) {
+        Console({ type: "error", message: "Data vazio." });
+        return {
+          error: null,
+          message: "Data vazio.",
+          data: null,
+        };
+      }
+
+      const total = data.length;
+      let success = 0;
+      let failure = 0;
+
+      Console({
+        type: "log",
+        message: `Sincronizando lista de clientes (${total})...`,
+      });
+
+      for (const customer of data as CustomerType[]) {
+        const { code_person } = customer;
+
+        if (!code_person && code_person !== 0) {
+          Console({
+            type: "warn",
+            message: "Código pessoa vazio, ignorando registro.",
+          });
+
+          failure++;
+
+          continue;
+        }
+
+        try {
+          const response = await this.registerCustomer(customer);
+
+          if (!response.data) {
+            Console({
+              type: "warn",
+              message: `Falha ao sincronizar cliente ${code_person}: ${response.message}`,
+            });
+
+            failure++;
+
+            continue;
+          }
+
+          Console({
+            type: "success",
+            message: `Cliente ${code_person} sincronizado com sucesso!`,
+          });
+
+          success++;
+        } catch (error) {
+          failure++;
+
+          Console({
+            type: "error",
+            message: `Erro ao sincronizar cliente ${code_person}.`,
+          });
+        }
+      }
+
+      const message = `Total de clientes sincronizados: ${success} de ${total}. Falhas: ${failure}`;
+      Console({ type: "success", message });
+    } catch (error) {
+      Console({
+        type: "error",
+        message: "Erro ao sincronizar clientes.",
+      });
+      return {
+        message: "Erro ao sincronizar clientes.",
+        error,
+        data: null,
+      };
+    }
   }
 
   // * Temporario
@@ -62,7 +176,7 @@ class CustomerController {
 
   async findCustomerByPartialName(req: Request, res: Response) {
     try {
-      const { name } = req.body;
+      const name = req.params.name;
       Console({ type: "log", message: "Buscando clientes" });
 
       const customers = await Customer.find(
@@ -100,9 +214,20 @@ class CustomerController {
 
   async listAll(req: Request, res: Response) {
     try {
+      const page = Number(req.params.page) || 1;
+      const customersPerPage = Number(req.params.number) || 5;
+
       Console({ type: "log", message: "Buscando todos os clientes." });
 
-      const customers = await Customer.find({}, { ...notReturn }).lean();
+      const customers = await Customer.find(
+        {},
+        { ...notReturn },
+        {
+          sort: { full_name: 1 },
+          limit: customersPerPage,
+          skip: (page - 1) * customersPerPage,
+        },
+      ).lean();
 
       if (!customers.length) {
         Console({ type: "warn", message: "Nenhum cliente encontrado." });
@@ -128,11 +253,19 @@ class CustomerController {
 
   async listAllActiveCustomers(req: Request, res: Response) {
     try {
+      const page = Number(req.params.page) || 1;
+      const customersPerPage = Number(req.params.number) || 5;
+
       Console({ type: "log", message: "Buscando clientes ativos." });
 
       const customers = await Customer.find(
         { status: 1 },
         { ...notReturn },
+        {
+          sort: { full_name: 1 },
+          limit: customersPerPage,
+          skip: (page - 1) * customersPerPage,
+        },
       ).lean();
 
       if (!customers.length) {
@@ -188,6 +321,137 @@ class CustomerController {
         .json({ message: "Erro interno inesperado.", error });
     }
   }
+
+  async updatePhoneCustomer(req: Request, res: Response) {
+    try {
+      const { id, phone_number } = req.body;
+
+      Console({ type: "log", message: "Atualizando telefone do cliente." });
+
+      const customerUpdated = await Customer.findByIdAndUpdate(
+        id,
+        {
+          $set: { "phone_numbers.0": phone_number },
+          updatedAt: new Date(),
+        },
+        { new: true, select: { ...notReturn } },
+      );
+
+      if (!customerUpdated) {
+        Console({ type: "error", message: "Cliente não encontrado" });
+        return res
+          .status(404)
+          .json({ message: "Cliente não encontrado", error: null });
+      }
+
+      Console({ type: "success", message: "Telefone atualizado com sucesso." });
+
+      return res.status(200).json({
+        message: "Telefone atualizado com sucesso.",
+        data: customerUpdated,
+      });
+    } catch (error) {
+      Console({
+        type: "error",
+        message: "Customer: Erro interno inesperado.",
+      });
+      return res
+        .status(500)
+        .json({ message: "Erro interno inesperado.", error });
+    }
+  }
+
+  async findManyAddressCustomer(req: Request, res: Response) {
+    try {
+      const { codes }: { codes: string[] | number[] } = req.body;
+
+      Console({
+        type: "log",
+        message: "Customer: Buscando endereço dos clientes.",
+      });
+
+      const customers = await Customer.find(
+        { code_person: { $in: codes } },
+        { code_person: 1, full_name: 1, address_person: 1 },
+      ).lean();
+
+      if (!customers.length) {
+        Console({
+          type: "error",
+          message:
+            "Customer: Nenhum cliente encontrado. | Origem: 'findAddressCustomer'",
+        });
+        return res.status(404).json({
+          message: "Nenhum cliente encontrado",
+          error: null,
+          data: [],
+        });
+      }
+
+      Console({
+        type: "success",
+        message: "Customer: Busca por endereços concluída.",
+      });
+
+      return res.status(200).json({
+        message: "Busca por endereços concluída.",
+        data: customers,
+      });
+    } catch (error) {
+      Console({
+        type: "error",
+        message: "Customer: Erro interno inesperado.",
+      });
+      return res
+        .status(500)
+        .json({ message: "Erro interno inesperado.", error });
+    }
+  }
+
+  async findAddressCustomer(req: Request, res: Response) {
+    try {
+      const code_person = req.params.code_person;
+
+      Console({
+        type: "log",
+        message: "Customer: Buscando endereço do cliente.",
+      });
+
+      const customer = await Customer.findOne(
+        { code_person },
+        { address_person: 1, full_name: 1 },
+      ).lean();
+
+      if (!customer) {
+        Console({
+          type: "error",
+          message:
+            "Customer: Cliente não encontrado. | Origem: 'findAddressCustomer'",
+        });
+        return res
+          .status(404)
+          .json({ message: "Cliente não encontrado", error: null });
+      }
+
+      Console({
+        type: "success",
+        message: "Customer: Busca por endereço concluída.",
+      });
+
+      return res.status(200).json({
+        message: "Busca por endereço concluída.",
+        data: customer,
+      });
+    } catch (error) {
+      Console({
+        type: "error",
+        message: "Customer: Erro interno inesperado.",
+      });
+      return res
+        .status(500)
+        .json({ message: "Erro interno inesperado.", error });
+    }
+  }
 }
 
-export default CustomerController
+export default new CustomerController();
