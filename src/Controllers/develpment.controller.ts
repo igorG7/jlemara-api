@@ -115,6 +115,44 @@ class DevelopmentController {
         .json({ message: "Erro interno inesperado.", error });
     }
   }
+
+  async updateLocation(req: Request, res: Response) {
+    try {
+      const { id, ...body } = req.body;
+
+      Console({ type: "log", message: "Atualizando obra." });
+
+      const updatedDevelopment = await Development.findByIdAndUpdate(
+        id,
+        {
+          latitude: body.latitude,
+          longitude: body.longitude,
+          link_maps: body?.link_maps ?? "",
+        },
+        { new: true },
+      );
+
+      if (!updatedDevelopment) {
+        Console({ type: "warn", message: "Obra não encontrada." });
+
+        return res
+          .status(404)
+          .json({ message: "Obra não encontrada.", error: null });
+      }
+
+      Console({ type: "success", message: "Obra atualizada com sucesso." });
+
+      return res.status(200).json({
+        message: "Obra atualizada com sucesso.",
+        data: updatedDevelopment,
+      });
+    } catch (error) {
+      Console({ type: "error", message: "Erro interno inesperado." });
+      return res
+        .status(500)
+        .json({ message: "Erro interno inesperado.", error });
+    }
+  }
 }
 
 export default new DevelopmentController();
