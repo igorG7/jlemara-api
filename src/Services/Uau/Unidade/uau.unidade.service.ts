@@ -10,10 +10,6 @@ export default class UauUnidadeService {
   async findAllUnidades() {
     try {
 
-      // EMPRESA 1 | É A EMPRESA QUE DETEM DAS UNIDADES NO ERP
-      // EMPRESA 2 | É UMA EMPRESA ANTIGA, QUE FAZIA PARTE DO GRUPO J.LEMARA
-      // NÃO EXISTE MAIS MAS, POSSUI INFORMAÇÕES CADASTRADAS
-
       const body = {
         where: "WHERE NumPer_unid LIKE '%%' AND Empresa_unid = '1' ",
         retorna_venda: true
@@ -27,7 +23,7 @@ export default class UauUnidadeService {
     } catch (error: any) {
       const message = error.response?.data?.message || error.message;
       Console({ type: "error", message: `findAllUnidades: ${message}` });
-      console.log(error.response.data)
+      console.log(error.response?.data)
       throw new Error(message);
     }
 
@@ -52,7 +48,37 @@ export default class UauUnidadeService {
     } catch (error: any) {
       const message = error.response?.data?.message || error.message;
       Console({ type: "error", message: `findAllUnidades: ${message}` });
-      console.log(error.response.data)
+      console.log(error.response?.data)
+      throw new Error(message);
+    }
+
+
+  }
+
+  async changeStatusUnidade({ produto, personalizacao, newStatus, newSubStatus, motivo }: { produto: number, personalizacao: number, newStatus: number, newSubStatus: number, motivo: string }) {
+    try {
+
+      const path = "Espelho/AlterarStatusUnidade"
+
+      const body = {
+        codigoEmpresa: 1,
+        codigoProduto: produto,
+        numeroPersonalizacao: personalizacao,
+        novoStatusUnidade: newStatus,
+        motivoAlteracao: motivo,
+        categoriaStatusPersonalizacao: newSubStatus
+      }
+
+      const data = await this.api.post(path, body) as any
+
+      const result = data
+
+      Console({ type: "success", message: `UAU: Unidade alterada com sucesso!` });
+      return result
+    } catch (error: any) {
+      const message = error.response?.data?.message || error.message;
+      Console({ type: "error", message: `changeStatusUnidade: ${message}` });
+      console.log(error.response?.data)
       throw new Error(message);
     }
 
@@ -62,37 +88,3 @@ export default class UauUnidadeService {
 
 
 }
-
-
-
-/*
-
-async changeStatusUnidade(product: number, cod_peson: number, new_status: number, reasonForChange: string, categoriaStatusPersonalizacao: number) {
-
-    Console({ type: "log", message: "Buscando unidades cadastradas " });
-
-    try {
-      const path = "/Espelho/AlterarStatusUnidade";
-      const body = {
-        codigoEmpresa: 1,
-        codigoProduto: produto,
-        numeroPersonalizacao: numPerson,
-        novoStatusUnidade: novoStatus,
-        motivoAlteracao: motivoAlteracao,
-        categoriaStatusPersonalizacao: categoriaStatusPersonalizacao
-      }
-
-      const response = await this.uauapi.post(path, body)
-      const result = response.status === 200
-
-      console.log("UNIDADES ENCONTRADAS", result);
-      return result
-    } catch (error: any) {
-      console.log("NÃO FOI POSSIVEL BUSCAR UNIDADES");
-      console.log("UAU error body:", error?.response?.data);
-      throw error;
-    }
-  }
-
-
-  */
