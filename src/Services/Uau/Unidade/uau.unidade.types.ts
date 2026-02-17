@@ -4,7 +4,7 @@ export type ResponseFindAllUnidades = {
   NumPer_unid: number;
   Obra_unid: string;
   Qtde_unid: number;
-  Vendido_unid: number; // Geralmente: 1-Disponível, 2-Reservado, 3-Vendido...
+  Vendido_unid: number; // Geralmente: 1-Disponível, 2-Reservado, 3-Vendido... | status da unidade
   Codigo_Unid: string | 'null';
   PorcentPr_Unid: number;
 
@@ -31,7 +31,7 @@ export type ResponseFindAllUnidades = {
   ObjEspelhoLeft_unid: string | 'null';
   PorcentComissao_unid: number | 'null';
   CodTipProd_unid: string | 'null';
-  NumCategStatus_unid: number | 'null';
+  NumCategStatus_unid: number | 'null'; // subStatus 8: fora de venda : 999 INVADIDO
   FracaoIdealDecimal_unid: number;
   DataEntregaChaves_unid: string | 'null';
   DataReconhecimentoReceitaMapa_unid: string | 'null';

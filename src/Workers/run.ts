@@ -16,9 +16,11 @@ ConnectionDB.connect()
 
 ? 03. PARA FAZER A EXECUÇÃO, RODE NPM RUN ETL ?
 
-* ESTÁ DEFINIDO PARA RODAR TODOS OS DIAS AS 05:00 AM *
+* CUSTOMER ESTÁ DEFINIDO PARA RODAR TODOS OS DIAS AS 05:00 AM *
 
 */
+
+// async function run(hora, minuto, function){}
 
 
 cron.schedule('0 5 * * *', async () => {
@@ -26,6 +28,7 @@ cron.schedule('0 5 * * *', async () => {
   Console({ type: "log", message: "⏰ Cron disparado: Iniciando ETL de Clientes (5:00 AM)" })
   try {
     await customerUauWorker.start()
+    return
   } catch (error) {
     const message = error instanceof Error ? error.message : "Problemas na inicialização ou processamento worker uau customer "
     Console({ type: "error", message });

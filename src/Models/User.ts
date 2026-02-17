@@ -2,28 +2,22 @@
 import mongoose, { Schema, Document } from "mongoose";
 
 export type UserRole =
-  | "AGENT" // talks to customers day-to-day
-  | "SUPERVISOR" // coordinates agents, distributes conversations
-  | "MANAGER" // full operational view, reports, settings
-  | "ADMIN"; // highest level, full access (2 levels above base)
+  | "ASSISTANT"     // Assistente | 0
+  | "CONSULTANT"    // Consultor  | 1
+  | "BROKER"        // Corretor   | 2
+  | "SUPERVISOR"    // Supervisor | 2
+  | "COORDINATOR"   // Coordenador| 4
+  | "MANAGER"       // Gerente    | 5
+  | "DIRECTOR";     // Diretor    | 6
 
-export type PendingStatus = "PENDING" | "IN_PROGRESS" | "COMPLETED";
+export type UserDepartment =
+  | "CRC"           // Customer Relationship Center
+  | "LEGAL"         // Jurídico
+  | "INVENTORY"     // Estoque
+  | "SALES"         // Vendas
+  | "OPERATIONS";    // Operações
 
-export type PendingIssueLogType = {
-  status: PendingStatus;
-  date: Date;
-  note: string;
-};
 
-export type PendingUserIssueType = {
-  title: string;
-  description: string;
-  date: Date;
-  reference: string;
-  dueDate: Date;
-  status: PendingStatus;
-  log: PendingIssueLogType[];
-};
 
 export interface UserType {
   _id?: string;
@@ -31,14 +25,13 @@ export interface UserType {
   email?: string;
   password?: string;
   phone?: string;
-
-  role?: UserRole; // multiple roles if needed
-  company?: string; // company / logical instance id
-  // instance?: string; // e.g. WhatsApp instance / tenant id // legado
-
+  role?: UserRole;
+  department?: UserDepartment;
+  company?: string;
+  teamId?: string;
   isActive?: boolean;
-  pendingIssues?: PendingUserIssueType[];
-
+  isExternal?: boolean;
+  pendingIssues?: string[];
   createdAt?: Date;
   updatedAt?: Date;
   lastAccessAt?: Date;
@@ -74,9 +67,14 @@ const UserSchema = new Schema<UserType>(
     },
 
     role: {
+      enum: ["ASSISTANT", "CONSULTANT", "BROKER", "SUPERVISOR", "COORDINATOR", "MANAGER", "DIRECTOR"],
+      default: "ASSISTANT",
       type: String,
-      enum: ["AGENT", "SUPERVISOR", "MANAGER", "ADMIN"],
-      default: ["AGENT"],
+      index: true,
+    },
+    department: {
+      type: String,
+      enum: ["CRC", "LEGAL", "INVENTORY", "SALES", "OPERATIONS"],
       index: true,
     },
 
@@ -87,15 +85,18 @@ const UserSchema = new Schema<UserType>(
       required: true,
     },
 
-    // WhatsApp instance / queue / tenant | *** L E G A D O ***
-    /*  instance: {
-       type: String,
-       trim: true,
-       default: "",
-       required: true,
-     }, */
-
+    teamId: {
+      type: Schema.Types.ObjectId,
+      ref: "Team",
+      index: true,
+    },
     isActive: {
+      type: Boolean,
+      default: true,
+      required: true,
+    },
+
+    isExternal: {
       type: Boolean,
       default: true,
       required: true,
@@ -120,7 +121,7 @@ const UserSchema = new Schema<UserType>(
     },
 
     pendingIssues: {
-      type: [Object], // ou Schema.Types.Mixed se preferir
+      type: [String],
       default: [],
       required: true,
     },
