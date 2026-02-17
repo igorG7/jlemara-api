@@ -5,6 +5,7 @@ import Development from "../Controllers/develpment.controller";
 import { validateFindDevelopment } from "../Middlewares/Development/validateFindDevelopment";
 import { validateLocationUpdate } from "../Middlewares/Development/validateLocationUpdate";
 import { validateInfraUpdate } from "../Middlewares/Development/validateInfraUpdate";
+import { validateInfoUpdate } from "../Middlewares/Development/validateInfoUpdate";
 
 const routes = Router();
 
@@ -23,6 +24,12 @@ routes.patch(
   "/update/infrastructure",
   validateInfraUpdate,
   Development.updateInfrastructure,
+);
+
+routes.patch(
+  "/update/infosite",
+  validateInfoUpdate,
+  Development.updateInfosSite,
 );
 
 export default routes;
