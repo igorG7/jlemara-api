@@ -1,5 +1,43 @@
 import mongoose, { Schema } from "mongoose";
-import { ref } from "process";
+
+const InfrastructureSchema = new Schema(
+  {
+    water_supply: { type: Boolean, default: false }, // Água
+    power_grid: { type: Boolean, default: false }, // Luz
+    internet: { type: Boolean, default: false },
+    sewage_system: { type: Boolean, default: false }, // Saneamento
+    road_paving: { type: Boolean, default: false }, // Pavimenteção
+    public_street_lighting: { type: Boolean, default: false }, // Iluminação pública
+    green_area: { type: Boolean, default: false },
+  },
+  { _id: false },
+);
+
+const PhotosSchema = new Schema(
+  {
+    url: { type: String, required: true, trim: true },
+    caption: { type: String, required: true, trim: true },
+    //description: { type: String, required: true, trim: true },
+    visibility: { type: Boolean, required: true, default: true },
+  },
+  { _id: false },
+);
+
+const HighlightsSchema = new Schema(
+  {
+    name: { type: String, default: null, trim: true },
+    description: { type: String, default: null, trim: true },
+  },
+  { _id: false },
+);
+
+const InfosSiteSchemas = new Schema({
+  title: { type: String, default: null, trim: true }, // titulo
+  description: { type: String, default: null, trim: true }, // descricao
+  highlights: { type: [HighlightsSchema], default: [] }, // destaques
+  price_from: { type: Number, default: null }, // precoAPartir
+  average_area_m2: { type: Number, default: null }, // areaMediaM2
+});
 
 const DevelopmentSchema = new Schema(
   {
@@ -21,8 +59,11 @@ const DevelopmentSchema = new Schema(
     link_maps: { type: String, default: "", trim: true },
     latitude: { type: String, default: "", trim: true },
     longitude: { type: String, default: "", trim: true },
+    infrastructure: { type: InfrastructureSchema, default: () => ({}) },
+    infos_site: { type: InfosSiteSchemas, default: () => ({}) },
+    photos: { type: [PhotosSchema], default: [] },
   },
-  { timestamps: true },
+  { timestamps: true, minimize: false },
 );
 
 const Development =
