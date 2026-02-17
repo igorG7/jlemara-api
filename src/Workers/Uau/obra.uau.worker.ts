@@ -1,4 +1,4 @@
-import { ResponseFindAllObras, ResponseFindObraWithCode } from "Services/Uau/Obra/uau.obra.types";
+import { ResponseFindAllObras, ResponseFindObraWithCode } from "../../Services/Uau/Obra/uau.obra.types";
 import Console, { ConsoleData } from "../../Lib/Console";
 import UauObraService from "../../Services/Uau/Obra/uau.obra.service";
 
@@ -27,7 +27,7 @@ export default class ObraUauWorker {
 
         try {
             // --- CONFIGURAÇÃO DE LOTE (CHUNKS) ---
-            const CHUNK_SIZE = 5 // Processa CHUNK_SIZE obras por vez em paralelo
+            const CHUNK_SIZE = 100 // Processa CHUNK_SIZE obras por vez em paralelo
 
             console.time("⏳ tempo total busca no erp ⏳");
 
@@ -103,7 +103,6 @@ export default class ObraUauWorker {
 
         } catch (error) {
             const message = error instanceof Error ? error.message : "Falha crítica no Worker de Sincronismo de Obras."
-            Console({ type: "error", message: "Falha crítica no Worker de Sincronismo de Obras." })
             Console({ type: "error", message })
             throw error
         }
