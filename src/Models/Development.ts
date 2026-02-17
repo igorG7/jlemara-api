@@ -31,13 +31,16 @@ const HighlightsSchema = new Schema(
   { _id: false },
 );
 
-const InfosSiteSchemas = new Schema({
-  title: { type: String, default: null, trim: true }, // titulo
-  description: { type: String, default: null, trim: true }, // descricao
-  highlights: { type: [HighlightsSchema], default: [] }, // destaques
-  price_from: { type: Number, default: null }, // precoAPartir
-  average_area_m2: { type: Number, default: null }, // areaMediaM2
-});
+const InfosSiteSchemas = new Schema(
+  {
+    title: { type: String, default: null, trim: true }, // titulo
+    description: { type: String, default: null, trim: true }, // descricao
+    highlights: { type: [HighlightsSchema], default: [] }, // destaques
+    price_from: { type: Number, default: null }, // precoAPartir
+    average_area_m2: { type: Number, default: null }, // areaMediaM2
+  },
+  { _id: false },
+);
 
 const DevelopmentSchema = new Schema(
   {
