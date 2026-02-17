@@ -27,11 +27,10 @@ const SALES_SAMPLES_DIR = path.resolve(__dirname, "../../Services/Uau/Sale/sampl
 // Obras com outros prefixos (ex: B, F) não são de interesse do produto atual.
 const OBRA_PREFIXOS_VALIDOS = ["R0", "J0"];
 
-// CHUNK_SIZE = 3 com 2 chamadas/venda = 6 concurrent requests → conservador para a API UAU.
-// Se a API UAU aguentar, pode elevar para 5 (= 10 concurrent).
+// CHUNK_SIZE = 10 com 2 chamadas/venda = 20 concurrent requests à UAU.
 // CustomerUauWorker usa 10, UnidadeUauWorker usa 50 — mas ambos fazem 1 chamada/item.
-const CHUNK_SIZE = 10; // ! GENTILEZA NÃO AUMENTAR ESSE NUMERO | ass apiUau :'(   ! \\
-// * ULTIMO TESTE - 38 VENDAS = 1:58.459 M:SS.MMM
+// ⚠️  NÃO AUMENTAR — último teste: 38 vendas = 1:58 m:ss com esse valor.
+const CHUNK_SIZE = 10;
 export type SaleSnapshot = {
   resumo: ResumoVenda;
   parcelas: ParcelaAReceber[]; // parcelas em aberto — pré-calculadas na data de consulta

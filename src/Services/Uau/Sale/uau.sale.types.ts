@@ -443,3 +443,33 @@ export type UnidadeComprada = {
   // Colunas genéricas (mapeamento varia por empreendimento)
   [key: `C${number}Unid`]: string | null | undefined;
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// ─── BuscarTiposDeCustas / BuscarStatusCobranca ───────────────────────────────
+
+export type ResponseTipoCustas = {
+  Codigo: string;
+  Descricao: string;
+};
+
+export type ResponseStatusDeCobranca = {
+  Codigo: string;
+  Descricao: string;
+};

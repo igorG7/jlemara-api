@@ -25,6 +25,8 @@ import {
   ConsultarUnidadesCompradasRequest,
   UnidadeComprada,
   ChaveVenda,
+  ResponseTipoCustas,
+  ResponseStatusDeCobranca,
 } from "./uau.sale.types";
 
 const SAMPLES_DIR = path.resolve(__dirname, "samples");
@@ -41,6 +43,70 @@ export default class UauSaleService {
 
   private api = uau;
 
+  async consultarHistorico(obra: string, dataInicio: string, dataFim: string): Promise<any[]> {
+    try {
+      const path = "Venda/ConsultarHistoricos";
+
+      const body = {
+        Vendas: [
+          {
+            Empresa: 1,
+            Obra: obra,
+          }
+        ],
+        DataInicio: dataInicio,
+        DataFim: dataFim,
+        TipoManutencao: "1,2,4"
+      }
+
+
+      const data = await this.api.post(path, body) as any[];
+
+      Console({ type: "success", message: `UAU: Historicos da venda retornados com sucesso.` });
+
+      return data;
+
+    } catch (error: any) {
+      const message = error.response?.data?.message || error.message || "Erro desconhecido";
+      Console({ type: "error", message: `consultarHistorico: ${message}` });
+      throw new Error(message);
+    }
+  }
+  async retornaTipoDeCustas(): Promise<ResponseTipoCustas[]> {
+    try {
+      const path = "Venda/BuscarTiposDeCustas";
+
+      const body = {}
+
+      const data = await this.api.post(path, body) as ResponseTipoCustas[];
+
+      Console({ type: "success", message: `UAU: Tipo de custas retornadas com sucesso.` });
+
+      return data;
+
+    } catch (error: any) {
+      const message = error.response?.data?.message || error.message || "Erro desconhecido";
+      Console({ type: "error", message: `retornaTipoDeCustas: ${message}` });
+      throw new Error(message);
+    }
+  }
+  async retornaStatusDeCobranca(): Promise<ResponseStatusDeCobranca[]> {
+    try {
+      const path = "Venda/BuscarStatusCobranca";
+
+      const body = {}
+
+      const data = await this.api.post(path, body) as ResponseStatusDeCobranca[];
+      Console({ type: "success", message: `UAU: Status de cobrança retornados com sucesso.` });
+
+      return data;
+
+    } catch (error: any) {
+      const message = error.response?.data?.message || error.message || "Erro desconhecido";
+      Console({ type: "error", message: `retornaStatusDeCobranca: ${message}` });
+      throw new Error(message);
+    }
+  }
   // ─── RetornaChavesVendasPorPeriodo ─────────────────────────────────────────
   // Retorna as chaves de todas as vendas no período informado.
   // Ponto de entrada natural para o ETL — equivalente ao findCustomersWithSale.
