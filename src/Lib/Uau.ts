@@ -45,9 +45,9 @@ uau.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
       const response = await axios.post(
         `${process.env.UAU_API_DEV}/Autenticador/AutenticarUsuario`,
         {
-          "Login": "icd",
-          "Senha": "{246813579aA}",
-          "UsuarioUAUSite": "icd"
+          "Login": process.env.UAU_USER!,
+          "Senha": process.env.UAU_PASSWORD!,
+          "UsuarioUAUSite": process.env.UAU_USER!
         },
         {
           headers: {
