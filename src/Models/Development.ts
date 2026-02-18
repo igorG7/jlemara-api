@@ -19,6 +19,7 @@ const PhotosSchema = new Schema(
     caption: { type: String, required: true, trim: true },
     //description: { type: String, required: true, trim: true },
     visibility: { type: Boolean, required: true, default: true },
+    // public id cloudinary
   },
   { _id: false },
 );
@@ -42,26 +43,30 @@ const InfosSiteSchemas = new Schema(
   { _id: false },
 );
 
+const AddresSchemas = new Schema(
+  {
+    street: { type: String, default: "", trim: true, required: true },
+    number: { type: Number, default: null, required: true },
+    district: { type: String, default: "", trim: true, required: true },
+    city: { type: String, default: "", trim: true, required: true },
+    zip_code: { type: String, default: null, required: true },
+    latitude: { type: String, default: "", trim: true },
+    longitude: { type: String, default: "", trim: true },
+  },
+  { _id: false },
+);
+
 const DevelopmentSchema = new Schema(
   {
     development_code: { type: String, index: true, trim: true }, // Cod_obr
     company: { type: Number }, // Empresa_obr
     description: { type: String, trim: true }, // Descr_obr
     status: { type: Number }, // Status_obr
-    address: { type: Object, trim: true }, // Ender_obr
-    phone: { type: String, trim: true }, // Fone_obr
-    inspector: { type: String, trim: true }, // Fisc_obr
-    start_date: { type: String }, // DtIni_obr
-    end_date: { type: String }, // Dtfim_obr
-    development_type: { type: Number }, // TipoObra_obr
-    sales_office_address: { type: String, trim: true }, // EnderEntr_obr
-    cei_registration: { type: String, default: null, trim: true }, // CEI_obr
-    created_by: { type: Schema.Types.ObjectId, ref: "User" }, // UsrCad_obr
+    address: { type: AddresSchemas, default: () => ({}) }, // Ender_obr
+    created_by: { type: Schema.Types.ObjectId, ref: "User" }, // UsrCad_obr Add chave tag-uau / senha-uau Model User
     is_public: { type: Boolean, default: false }, // publico
     public_name: { type: String, default: "", trim: true }, // nomePublico
     link_maps: { type: String, default: "", trim: true },
-    latitude: { type: String, default: "", trim: true },
-    longitude: { type: String, default: "", trim: true },
     infrastructure: { type: InfrastructureSchema, default: () => ({}) },
     infos_site: { type: InfosSiteSchemas, default: () => ({}) },
     photos: { type: [PhotosSchema], default: [] },
