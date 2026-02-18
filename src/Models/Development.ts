@@ -4,11 +4,11 @@ const InfrastructureSchema = new Schema(
   {
     water_supply: { type: Boolean, default: false }, // Água
     power_grid: { type: Boolean, default: false }, // Luz
-    internet: { type: Boolean, default: false },
+    internet: { type: Boolean, default: false }, // Internet
     sewage_system: { type: Boolean, default: false }, // Saneamento
     road_paving: { type: Boolean, default: false }, // Pavimenteção
     public_street_lighting: { type: Boolean, default: false }, // Iluminação pública
-    green_area: { type: Boolean, default: false },
+    green_area: { type: Boolean, default: false }, // Area verde
   },
   { _id: false },
 );
@@ -17,9 +17,8 @@ const PhotosSchema = new Schema(
   {
     url: { type: String, required: true, trim: true },
     caption: { type: String, required: true, trim: true },
-    //description: { type: String, required: true, trim: true },
     visibility: { type: Boolean, required: true, default: true },
-    // public id cloudinary
+    public_id: { type: String, required: true, default: true },
   },
   { _id: false },
 );
