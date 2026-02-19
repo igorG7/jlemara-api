@@ -17,8 +17,8 @@ const PhotosSchema = new Schema(
   {
     url: { type: String, required: true, trim: true },
     caption: { type: String, required: true, trim: true },
-    visibility: { type: Boolean, required: true, default: true },
-    public_id: { type: String, required: true, default: true },
+    visibility: { type: Boolean, required: true },
+    public_id: { type: String, required: true },
   },
   { _id: false },
 );
