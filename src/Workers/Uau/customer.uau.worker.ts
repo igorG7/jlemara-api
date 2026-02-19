@@ -10,7 +10,7 @@ import UauCustomerService from "Services/Uau/Customer/uau.costumer.service";
 
 export default class CustomerUauWorker {
   private customerUauService = new UauCustomerService();
-  private customerController = new CustomerController();
+  private customerController = CustomerController
   private isRunning = false
 
   async start() {
@@ -134,7 +134,7 @@ export default class CustomerUauWorker {
       };
 
 
-      await this.customerController.register(formatted);
+      await this.customerController.registerCustomer(formatted);
 
     } catch (error) {
       throw error;

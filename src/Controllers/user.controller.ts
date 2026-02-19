@@ -8,6 +8,7 @@ import { UserType } from "../Models/User";
 
 export type AuthBody = { email: string; password: string };
 export type FindUserBody = { email?: string; id?: string };
+export type FindUserByRole = { role: string };
 export type UpdateUserBody = { id: string; body: UserType };
 export type UpdatePassBody = { id: string; password: string };
 
@@ -184,6 +185,32 @@ class UserController {
       return res
         .status(200)
         .json({ message: "Usuário encontrado com sucesso.", user });
+    } catch (error) {
+      Console({ type: "error", message: "Erro interno inesperado." });
+      return res
+        .status(500)
+        .json({ message: "Erro interno inesperado", error });
+    }
+  };
+  findUserByRole = async (req: Request, res: Response) => {
+    try {
+      const { role }: FindUserByRole = req.body;
+
+
+
+      const users = await User.find({ role: { $in: [role] }, isActive: true }, { ...notReturn });
+
+      if (!users) {
+        Console({ type: "error", message: "Usuários não encontrados." });
+        return res
+          .status(404)
+          .json({ message: "Usuário não encontrado.", error: null });
+      }
+
+      Console({ type: "success", message: "Usuários encontrados com sucesso." });
+      return res
+        .status(200)
+        .json({ message: "Usuário encontrado com sucesso.", users });
     } catch (error) {
       Console({ type: "error", message: "Erro interno inesperado." });
       return res

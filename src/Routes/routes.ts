@@ -6,12 +6,14 @@ import pendingIssuesRoutes from "./pendingissues.routes";
 import { verifyToken } from "../Middlewares/Auth/verifyToken";
 import customerRoutes from "./customer.routes";
 import developmentRoutes from "./development.routes";
-
+import saleTeamRoutes from "./sale.team.routes";
 const routes = Router();
 
 routes.use("/users", userRoutes);
-routes.use("/pendingissues", verifyToken, pendingIssuesRoutes);
+// routes.use(verifyToken);
+routes.use("/pendingissues", pendingIssuesRoutes);
 routes.use("/customer", customerRoutes);
 routes.use("/development", developmentRoutes);
+routes.use("/sale-team", saleTeamRoutes);
 
 export default routes;
