@@ -19,13 +19,14 @@ class DevelopmentController {
   async listAll(req: Request, res: Response) {
     try {
       const page = Number(req.params.page) || 1;
-      // limit dinamico
+      const number = Number(req.params.number) || 10;
+
       Console({ type: "log", message: "Buscando obras." });
 
       const developments = await Development.find(
         {},
         {},
-        { limit: 5, skip: (page - 1) * 5 },
+        { limit: number, skip: (page - 1) * number },
       ).lean();
 
       if (!developments.length) {
@@ -79,13 +80,14 @@ class DevelopmentController {
   async findPublics(req: Request, res: Response) {
     try {
       const page = Number(req.params.page) || 1;
-      // limit dinamico
+      const number = Number(req.params.number) || 10;
+
       Console({ type: "log", message: "Buscando obras públicas." });
 
       const developments = await Development.find(
         { is_public: true },
         {},
-        { limit: 5, skip: (page - 1) * 5 },
+        { limit: number, skip: (page - 1) * number },
       ).lean();
 
       if (!developments.length) {
