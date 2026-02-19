@@ -220,10 +220,10 @@ class DevelopmentController {
           message: "Obra não encontrada.",
         });
 
-        return {
+        return res.status(404).json({
           message: "Obra não encontrada.",
           error: null,
-        };
+        });
       }
 
       Console({
