@@ -48,6 +48,7 @@ export const validateInfoUpdate = (
 
   const validKeys = [
     "title",
+    "name",
     "description",
     "highlights",
     "price_from",
@@ -58,41 +59,31 @@ export const validateInfoUpdate = (
     if (!validKeys.includes(key) || !value) {
       Console({
         type: "error",
-        message: `Chave '${key}' inválida ou sem valor .`,
+        message: `Chave '${key}' inválida ou sem valor.`,
       });
 
       return res.status(400).json({
-        message: `Chave '${key}' inválida ou sem valor .`,
+        message: `Chave '${key}' inválida ou sem valor.`,
         error: null,
       });
     }
   }
 
-  //   for (const [key, value] of Object.entries(body.highlights)) {
-  //     if (key.name !== "name" && key !== "description") {
-  //       Console({
-  //         type: "error",
-  //         message: `Chave '${key}' inválida em 'Destaques'.`,
-  //       });
+  const highlights = body.highlights;
 
-  //       return res.status(400).json({
-  //         message: `Chave '${key}' inválida em 'Destaques'.`,
-  //         error: null,
-  //       });
-  //     }
+  if (highlights) {
+    for (const key in highlights) {
+      const highlight = highlights[key];
 
-  //     if (!value) {
-  //       Console({
-  //         type: "error",
-  //         message: `Chave '${key}' sem valor.`,
-  //       });
-
-  //       return res.status(400).json({
-  //         message: `Chave '${key}' sem valor.`,
-  //         error: null,
-  //       });
-  //     }
-  //   }
+      for (const key in highlight) {
+        if (!validKeys.includes(key)) {
+          return res
+            .status(400)
+            .json({ message: `Chave '${key}' inválida para os destaques.` });
+        }
+      }
+    }
+  }
 
   next();
 };
