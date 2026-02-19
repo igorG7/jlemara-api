@@ -404,6 +404,44 @@ class DevelopmentController {
       });
     }
   }
+
+  async removePhoto(req: Request, res: Response) {
+    try {
+      const { id, public_id } = req.body;
+
+      const updatedDevelopment = await Development.findByIdAndUpdate(
+        id,
+        {
+          $pull: { photos: { public_id: public_id } },
+          updatedAt: new Date(),
+        },
+        { new: true },
+      );
+
+      if (!updatedDevelopment) {
+        Console({ type: "warn", message: "Obra não encontrada." });
+
+        return res.status(404).json({
+          message: "Obra não encontrada.",
+          error: null,
+        });
+      }
+
+      Console({ type: "success", message: "Foto removida com sucesso!" });
+
+      return res.status(200).json({
+        message: "Foto removida com sucesso!",
+        data: updatedDevelopment,
+      });
+    } catch (error) {
+      Console({ type: "error", message: "Erro interno inesperado." });
+
+      return res.status(500).json({
+        message: "Erro interno inesperado.",
+        error,
+      });
+    }
+  }
 }
 
 export default new DevelopmentController();
