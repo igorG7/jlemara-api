@@ -77,7 +77,7 @@ class DevelopmentController {
     }
   }
 
-  async findPublics(req: Request, res: Response) {
+  async listPublics(req: Request, res: Response) {
     try {
       const page = Number(req.params.page) || 1;
       const number = Number(req.params.number) || 10;
