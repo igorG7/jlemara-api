@@ -6,6 +6,7 @@ import { validateFindDevelopment } from "../Middlewares/Development/validateFind
 import { validateLocationUpdate } from "../Middlewares/Development/validateLocationUpdate";
 import { validateInfraUpdate } from "../Middlewares/Development/validateInfraUpdate";
 import { validateInfoUpdate } from "../Middlewares/Development/validateInfoUpdate";
+import { validatePhotoUpdate } from "../Middlewares/Development/validatePhotoUpdate";
 
 const routes = Router();
 
@@ -31,5 +32,7 @@ routes.patch(
   validateInfoUpdate,
   Development.updateInfosSite,
 );
+
+routes.patch("/update/photos", validatePhotoUpdate, Development.addPhoto);
 
 export default routes;
