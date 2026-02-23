@@ -26,9 +26,9 @@ class DevelopmentController {
       });
 
       const development = await Development.findOneAndUpdate(
-        development_code,
+        { development_code },
         {
-          $set: { ...data },
+          ...data,
           updatedAt: new Date(),
         },
         { upsert: true, new: true },
@@ -46,7 +46,7 @@ class DevelopmentController {
       };
     } catch (error) {
       Console({ type: "error", message: "Erro ao cadastrar/atualizar obra." });
-      // ConsoleData({ type: "error", data: error });
+      ConsoleData({ type: "error", data: error });
 
       return {
         status: 500,
@@ -232,7 +232,7 @@ class DevelopmentController {
     }
   }
 
-  async updateLocation(req: Request, res: Response) {
+  async updateAddress(req: Request, res: Response) {
     try {
       const { id, ...body } = req.body;
 
@@ -241,9 +241,8 @@ class DevelopmentController {
       const updatedDevelopment = await Development.findByIdAndUpdate(
         id,
         {
-          latitude: body.latitude,
-          longitude: body.longitude,
-          link_maps: body?.link_maps ?? "",
+          $set: body,
+          updatedAt: new Date(),
         },
         { new: true },
       );
