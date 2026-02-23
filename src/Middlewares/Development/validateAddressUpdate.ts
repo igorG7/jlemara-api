@@ -19,31 +19,65 @@ import Console from "../../Lib/Console";
  * @returns {Response | void} Retorna uma resposta HTTP 400 em caso de erro ou chama `next()` em caso de sucesso.
  */
 
-export const validateLocationUpdate = (
+export const validateAddressUpdate = (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
-  const { id, latitude, longitude } = req.body;
+  const { id, ...body } = req.body;
 
   if (!id) {
     Console({ type: "error", message: "ID da obra não informado." });
 
-    return res
-      .status(400)
-      .json({ message: "ID da obra não informado.", error: null });
+    return res.status(400).json({
+      message: "ID da obra não informado.",
+      error: null,
+    });
   }
 
-  if (!latitude || !longitude) {
+  if (!body) {
     Console({
       type: "error",
-      message: "Latitude ou Longitude não informados.",
+      message: "Nenhuma informação enviada.",
     });
 
-    return res
-      .status(400)
-      .json({ message: "Latitude ou Longitude não informados.", error: null });
+    return res.status(400).json({
+      message: "Nenhuma informação enviada.",
+      error: null,
+    });
   }
+
+  const validKeys = [
+    "number",
+    "street",
+    "district",
+    "zip_code",
+    "city",
+    "longitude",
+    "latitude",
+  ];
+
+  for (const [key, value] of Object.entries(body)) {
+    if (!validKeys.includes(key) || !value) {
+      Console({
+        type: "error",
+        message: `Chave '${key}' inválida ou sem valor.`,
+      });
+
+      return res.status(400).json({
+        message: `Chave '${key}' inválida ou sem valor.`,
+        error: null,
+      });
+    }
+  }
+
+  let newBody: any = {};
+
+  for (const key in body) {
+    newBody[`address.${key}`] = body[key];
+  }
+
+  req.body = { id, ...newBody };
 
   next();
 };
