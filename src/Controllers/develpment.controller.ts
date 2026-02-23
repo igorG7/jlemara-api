@@ -232,6 +232,40 @@ class DevelopmentController {
     }
   }
 
+  async updateDevelopment(req: Request, res: Response) {
+    try {
+      const { id, ...body } = req.body;
+
+      Console({ type: "log", message: "Atualizando obra." });
+
+      const updatedDevelopment = await Development.findByIdAndUpdate(
+        id,
+        { ...body },
+        { new: true },
+      );
+
+      if (!updatedDevelopment) {
+        Console({ type: "warn", message: "Obra não encontrada." });
+
+        return res
+          .status(404)
+          .json({ message: "Obra não encontrada.", error: null });
+      }
+
+      Console({ type: "success", message: "Obra atualizada com sucesso." });
+
+      return res.status(200).json({
+        message: "Obra atualizada com sucesso.",
+        data: updatedDevelopment,
+      });
+    } catch (error) {
+      Console({ type: "error", message: "Erro interno inesperado." });
+      return res
+        .status(500)
+        .json({ message: "Erro interno inesperado.", error });
+    }
+  }
+
   async updateAddress(req: Request, res: Response) {
     try {
       const { id, ...body } = req.body;
