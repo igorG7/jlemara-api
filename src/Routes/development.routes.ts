@@ -3,11 +3,12 @@ import { Router } from "express";
 import Development from "../Controllers/develpment.controller";
 
 import { validateFindDevelopment } from "../Middlewares/Development/validateFindDevelopment";
-import { validateLocationUpdate } from "../Middlewares/Development/validateLocationUpdate";
+import { validateAddressUpdate } from "../Middlewares/Development/validateAddressUpdate";
 import { validateInfraUpdate } from "../Middlewares/Development/validateInfraUpdate";
 import { validateInfoUpdate } from "../Middlewares/Development/validateInfoUpdate";
 import { validatePhotoUpdate } from "../Middlewares/Development/validatePhotoUpdate";
 import { validatePhotoDelete } from "../Middlewares/Development/validatePhotoDelete";
+import { validateDevelopmentUpdate } from "../Middlewares/Development/validateDevelopmentUpdate";
 
 const routes = Router();
 
@@ -17,9 +18,9 @@ routes.get("/page/:page/number/:number", Development.listAll);
 routes.get("/public/page/:page/number/:number", Development.listPublics);
 
 routes.patch(
-  "/update/location",
-  validateLocationUpdate,
-  Development.updateLocation,
+  "/update/address",
+  validateAddressUpdate,
+  Development.updateAddress,
 );
 
 routes.patch(
@@ -32,6 +33,12 @@ routes.patch(
   "/update/infosite",
   validateInfoUpdate,
   Development.updateInfosSite,
+);
+
+routes.patch(
+  "/update",
+  validateDevelopmentUpdate,
+  Development.updateDevelopment,
 );
 
 routes.patch("/update/photos", validatePhotoUpdate, Development.addPhoto);
