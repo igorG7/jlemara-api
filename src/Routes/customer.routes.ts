@@ -27,6 +27,12 @@ routes.get(
   Customer.findAddressCustomer,
 );
 
+routes.post(
+  "/phone-numbers",
+
+  Customer.findPhoneNumbers,
+);
+
 // Rotas de busca que utlizam filtros mais detalhadas (POST).
 // A utilização de POST de faz necessária para um envio de dados mais complexo para realizar a busca.
 routes.post("/search", validateFindCustomer, Customer.findCustomer);

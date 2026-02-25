@@ -452,6 +452,59 @@ class CustomerController {
         .json({ message: "Erro interno inesperado.", error });
     }
   }
+
+  async findPhoneNumbers(req: Request, res: Response) {
+    try {
+      const { codes }: { codes: string[] | number[] } = req.body;
+
+      Console({
+        type: "log",
+        message: "Customer: Buscando telefones dos clientes.",
+      });
+
+      const customers = await Customer.find(
+        { code_person: { $in: codes }, phone_numbers: { $exists: true, $not: { $size: 0 }, $ne: null } },
+        { code_person: 1, full_name: 1, phone_numbers: 1 },
+      ).lean();
+
+      if (!customers.length) {
+        Console({
+          type: "error",
+          message:
+            "Customer: Nenhum cliente com telefone encontrado. | Origem: 'findPhoneNumbers'",
+        });
+        return res.status(404).json({
+          message: "Nenhum cliente com telefone encontrado",
+          error: null,
+          data: [],
+        });
+      }
+
+      const data = customers.map((c) => ({
+        code_person: c.code_person,
+        full_name: c.full_name,
+        phone_numbers: c.phone_numbers[0],
+      }));
+
+      Console({
+        type: "success",
+        message: "Customer: Busca por telefones concluída.",
+      });
+
+      return res.status(200).json({
+        message: "Busca por telefones concluída.",
+        data,
+      });
+    } catch (error) {
+      Console({
+        type: "error",
+        message: "Customer: Erro interno inesperado.",
+      });
+      return res
+        .status(500)
+        .json({ message: "Erro interno inesperado.", error });
+    }
+  }
 }
 
 export default new CustomerController();
