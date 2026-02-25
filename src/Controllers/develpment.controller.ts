@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 
 import Development from "../Models/Development";
 import Console, { ConsoleData } from "../Lib/Console";
+import { IDevelopment } from "Types/Development/Development";
 
 class DevelopmentController {
   async createTemp(req: Request, res: Response) {
@@ -16,9 +17,9 @@ class DevelopmentController {
     }
   }
 
-  async registerDevelopment(data: any) {
+  async registerDevelopment(data: IDevelopment) {
     try {
-      const { development_code } = data;
+      const { development_code, address, ...body } = data;
 
       Console({
         type: "log",
@@ -28,10 +29,9 @@ class DevelopmentController {
       const development = await Development.findOneAndUpdate(
         { development_code },
         {
-          ...data,
-          updatedAt: new Date(),
+          $set: { ...body, ...address, updatedAt: new Date() },
         },
-        { upsert: true, new: true },
+        { upsert: true, new: true, setDefaultsOnInsert: true },
       ).lean();
 
       Console({
