@@ -19,12 +19,12 @@ const redis = new RedisController();
 
 // Instância base do Axios para o UAU
 const uau: AxiosInstance = axios.create({
-  baseURL: process.env.UAU_API_DEV!,
+  baseURL: process.env.UAU_API_PATH!,
   timeout: 45000, // segundos timeout
   headers: {
     Accept: "application/json",
     "Content-Type": "application/json",
-    "X-INTEGRATION-Authorization": process.env.UAU_API_TOKEN!
+    "X-INTEGRATION-Authorization": process.env.UAU_API_TOKEN!,
   },
 });
 
@@ -39,30 +39,36 @@ uau.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
     let token = await redis.getUauToken();
     // 2. Se não houver token (Cache Miss), realiza nova autenticação no ERP
     if (token === null) {
-      Console({ type: "warn", message: "UAU API: Token não encontrado no cache. Iniciando renovação..." });
+      Console({
+        type: "warn",
+        message:
+          "UAU API: Token não encontrado no cache. Iniciando renovação...",
+      });
 
       // Chamada direta ao endpoint de autenticação (usando axios puro para evitar loop)
       const response = await axios.post(
-        `${process.env.UAU_API_DEV}/Autenticador/AutenticarUsuario`,
+        `${process.env.UAU_API_PATH}/Autenticador/AutenticarUsuario`,
         {
-          "Login": process.env.UAU_USER!,
-          "Senha": process.env.UAU_PASSWORD!,
-          "UsuarioUAUSite": process.env.UAU_USER!
+          Login: process.env.UAU_USER!,
+          Senha: process.env.UAU_PASSWORD!,
+          UsuarioUAUSite: process.env.UAU_USER!,
         },
         {
           headers: {
-            "X-INTEGRATION-Authorization": process.env.UAU_API_TOKEN!
-          }
-        }
+            "X-INTEGRATION-Authorization": process.env.UAU_API_TOKEN!,
+          },
+        },
       );
 
-
-      token = response.data
+      token = response.data;
 
       // 3. Persiste o novo token no Redis para uso das outras instâncias do Cluster
       await redis.setUauToken(String(token));
 
-      Console({ type: "success", message: "UAU API: Novo token gerado e armazenado com sucesso." });
+      Console({
+        type: "success",
+        message: "UAU API: Novo token gerado e armazenado com sucesso.",
+      });
     }
 
     // 4. Injeta o token nos headers da requisição original
@@ -71,12 +77,11 @@ uau.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
     }
 
     return config;
-
   } catch (error: any) {
-    console.log(error)
+    console.log(error);
     Console({
       type: "error",
-      message: `UAU API: Falha crítica no fluxo de autenticação - ${error.message}`
+      message: `UAU API: Falha crítica no fluxo de autenticação - ${error.message}`,
     });
 
     // Interrompe a requisição para não enviar headers inválidos
@@ -97,7 +102,8 @@ uau.interceptors.response.use(
     if (error.response?.status === 401) {
       Console({
         type: "error",
-        message: "UAU API: Token invalidado pelo servidor (401). Limpando cache do Redis."
+        message:
+          "UAU API: Token invalidado pelo servidor (401). Limpando cache do Redis.",
       });
 
       await redis.deleteUauToken();
@@ -107,7 +113,7 @@ uau.interceptors.response.use(
     }
 
     return Promise.reject(error);
-  }
+  },
 );
 
 export default uau;
