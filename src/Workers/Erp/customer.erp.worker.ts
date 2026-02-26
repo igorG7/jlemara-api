@@ -1,15 +1,15 @@
 //src\Workers\Uau\customer.uau.worker.ts
 import Console, { ConsoleData } from "../../Lib/Console";
-import { CustomersWithSale } from "../../Services/Uau/Customer/uau.customer.dto";
+import { CustomerWithSale } from "../../Services/Erp/Customer/erp.customer.types";
 import { AddressType, CustomerType } from "Types/CustomerTypes";
 import parseBRDate from "../../Utils/dateParser";
 import CustomerController from "../../Controllers/customer.controller";
 import mountCustomerAdress from "./utils/mountCustomerAdress";
-import UauCustomerService from "Services/Uau/Customer/uau.costumer.service";
+import Erp from "../../Services/Erp";
 
 
-export default class CustomerUauWorker {
-  private customerUauService = new UauCustomerService();
+export default class CustomerErpWorker {
+  private customerService = Erp.customer
   private customerController = CustomerController
   private isRunning = false
 
@@ -34,7 +34,7 @@ export default class CustomerUauWorker {
     Console({ type: "log", message: "Iniciando verificação em lote no ERP UAU." });
 
     try {
-      const customersWithSale = (await this.customerUauService.findCustomersWithSale()) as CustomersWithSale[];
+      const customersWithSale = (await this.customerService.findCustomersWithSale()) as CustomerWithSale[];
 
       if (!customersWithSale || customersWithSale.length === 0) {
         Console({ type: "success", message: "Nenhum cliente encontrado." });
@@ -49,9 +49,9 @@ export default class CustomerUauWorker {
       let errorCount = 0;
 
       // --- CONFIGURAÇÃO DE LOTE (CHUNKS) ---
-      const CHUNK_SIZE = 10; // Processa CHUNK_SIZE clientes por vez em paralelo
+      const CHUNK_SIZE = 20; // Processa CHUNK_SIZE clientes por vez em paralelo
 
-      const dataToProcess = customersWithSale // utilizado para testes com um .slice(x, y)
+      const dataToProcess = customersWithSale.slice(0, 100)// utilizado para testes com um .slice(x, y)
 
       for (let i = 0; i < dataToProcess.length; i += CHUNK_SIZE) {
 
@@ -65,16 +65,16 @@ export default class CustomerUauWorker {
             try {
               if (!item.Cod_pes) return;
 
-              const detail = await this.customerUauService.findCustomerWithCode(item.Cod_pes);
+              const detail = await this.customerService.findCustomerByCode(item.Cod_pes);
               if (!detail) return;
 
-              const phones = await this.customerUauService.findPhonesCustomer(item.Cod_pes);
+              const phones = await this.customerService.findPhonesCustomer(item.Cod_pes);
 
-              const address = await this.customerUauService.findAdressCustomer(item.Cod_pes);
+              const address = await this.customerService.findAddressCustomer(item.Cod_pes);
 
               const fullData = { ...detail, phones, address };
 
-              await this.formatCustomerAndSave(fullData);
+              // await this.formatCustomerAndSave(fullData);
 
               saved++;
             } catch (error) {

@@ -1,6 +1,7 @@
 import { configDotenv } from "dotenv";
 
 import app from "./app";
+import UnidadeUauWorker from "./Workers/Erp/unidade.erp.worker";
 
 configDotenv();
 
@@ -11,5 +12,9 @@ app.listen(PORT, async () => {
 
   console.log("Servidor iniciado.");
   console.log(`Servidor rodando em http://${HOST}:${PORT}.`);
+
+  const a = new UnidadeUauWorker()
+
+  a.start()
 
 });

@@ -1,10 +1,10 @@
-import { ResponseFindAllObras, ResponseFindObraWithCode } from "../../Services/Uau/Obra/uau.obra.types";
 import Console, { ConsoleData } from "../../Lib/Console";
-import UauObraService from "../../Services/Uau/Obra/uau.obra.service";
+import Erp from "../../Services/Erp";
+import { ResponseFindDevelopmentByCode } from "../../Services/Erp/Development/erp.development.types";
 
-export default class ObraUauWorker {
+export default class DevelopmentErpWorker {
 
-    private obraUauService = new UauObraService();
+    private developmentErp = Erp.development
     private isRunning = false
 
     async start() {
@@ -31,17 +31,17 @@ export default class ObraUauWorker {
 
             console.time("⏳ tempo total busca no erp ⏳");
 
-            const obrasErp = await this.obraUauService.findAllObras() as ResponseFindAllObras[]
-
+            const obrasErp = await this.developmentErp.findAllDevelopments()
+            if (!obrasErp) throw new Error("Nenhuma obra encontrada no ERP UAU.")
             const totalItems = obrasErp.length
             let qtdObrasErpCompletas = 0
             let qtdErroDeBusca = 0
 
             Console({ type: "log", message: `${totalItems} obras identificadas no ERP UAU.` });
 
-            const obrasInfoCompleta: ResponseFindObraWithCode[] = []
+            const obrasInfoCompleta: ResponseFindDevelopmentByCode[] = []
 
-            const dataToProcess = obrasErp // utilizado para testes com um .slice(x, y)
+            const dataToProcess = obrasErp.slice(0, 100) // utilizado para testes com um .slice(x, y)
 
             for (let i = 0; i < dataToProcess.length; i += CHUNK_SIZE) {
 
@@ -57,7 +57,7 @@ export default class ObraUauWorker {
                                 return
                             }
 
-                            const findCompleteData = await this.obraUauService.findObraWithCode(obra.Cod_obr)
+                            const findCompleteData = await this.developmentErp.findDevelopmentByCode(1, obra.Cod_obr)
 
                             if (!findCompleteData) {
                                 qtdErroDeBusca++

@@ -2,12 +2,13 @@ import Console, { ConsoleData } from "../../Lib/Console";
 import { ResponseFindAllObras } from "../../Services/Uau/Obra/uau.obra.types";
 import { ResponseFindAllUnidades } from "../../Services/Uau/Unidade/uau.unidade.types";
 import UauObraService from "../../Services/Uau/Obra/uau.obra.service";
-import UauUnidadeService from "../../Services/Uau/Unidade/uau.unidade.service";
+import Erp from "../../Services/Erp";
+import { ResponseFindAllUnits } from "Services/Erp/Unit/erp.unit.types";
 
-export default class UnidadeUauWorker {
+export default class UnitErpWorker {
 
-    private unidadeUauService = new UauUnidadeService();
-    private obraUauService = new UauObraService();
+    private unitErp = Erp.unit
+    private developmentErp = Erp.development
     private isRunning = false;
 
     async start() {
@@ -33,7 +34,7 @@ export default class UnidadeUauWorker {
             const CHUNK_SIZE = 50; // Processa CHUNK_SIZE obras em paralelo por vez
 
             console.time("⏳ tempo busca obras ⏳");
-            const obrasErp = await this.obraUauService.findAllObras() as ResponseFindAllObras[];
+            const obrasErp = await this.developmentErp.findAllDevelopments() as ResponseFindAllObras[];
             console.timeEnd("⏳ tempo busca obras ⏳");
 
             const totalObras = obrasErp.length;
@@ -42,9 +43,9 @@ export default class UnidadeUauWorker {
 
             Console({ type: "log", message: `${totalObras} obras identificadas no ERP UAU. Iniciando busca de unidades por obra...` });
 
-            const todasAsUnidades: ResponseFindAllUnidades[] = [];
+            const todasAsUnidades: ResponseFindAllUnits[] = []
 
-            const dataToProcess = obrasErp; // utilizado para testes com um .slice(x, y)
+            const dataToProcess = obrasErp.slice(0, 100); // utilizado para testes com um .slice(x, y)
 
             console.time("⏳ tempo total busca no erp ⏳");
 
@@ -62,9 +63,9 @@ export default class UnidadeUauWorker {
                                 return;
                             }
 
-                            const unidades = await this.unidadeUauService.findUnidadesWithObraCode(obra.Cod_obr);
+                            const unidades = await this.unitErp.findUnitsByCode(1, obra.Cod_obr) as ResponseFindAllUnits[]
 
-                            todasAsUnidades.push(...unidades);
+                            todasAsUnidades.push(...unidades)
                             qtdObrasProcessadas++;
                         } catch (error) {
                             qtdErroBuscaObra++;

@@ -1,4 +1,4 @@
-import { CustomerAddress } from "Services/Uau/Customer/uau.customer.dto";
+import { CustomerAddress } from "../../../Services/Erp/Customer/erp.customer.types";
 import { AddressType } from "Types/CustomerTypes";
 
 // src/Utils/dateParser.ts

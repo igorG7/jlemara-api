@@ -1,30 +1,30 @@
 //src\Workers\run.ts
 import cron from 'node-cron';
-import CustomerUauWorker from './Uau/customer.uau.worker';
-import ObraUauWorker from './Uau/obra.uau.worker';
-import UnidadeUauWorker from './Uau/unidade.uau.worker';
+import CustomerErpWorker from './Erp/customer.erp.worker';
 import Console, { ConsoleData } from '../Lib/Console';
 import ConnectionDB from '../Configs/ConnectionDB';
+import DevelopmentErpWorker from './Erp/obra.erp.worker';
+import UnitErpWorker from './Erp/unidade.erp.worker';
 
 
-const customerUauWorker = new CustomerUauWorker()
-const obraUauWorker = new ObraUauWorker()
-const unidadeUauWorker = new UnidadeUauWorker()
+const customerErpWorker = new CustomerErpWorker()
+const developmentErpWorker = new DevelopmentErpWorker()
+const unitsErpWorker = new UnitErpWorker()
 ConnectionDB.connect()
 
 
 // CUSTOMER  → todos os dias às 05:00 AM
 cron.schedule('0 5 * * *', async () => {
-  Console({ type: "log", message: "⏰ Cron disparado: Iniciando ETL de Clientes (5:00 AM)" })
+  Console({ type: "log", message: "⏰ Cron disparado: Iniciando ETL de Customer (5:00 AM)" })
   try {
-    await customerUauWorker.start()
+    await customerErpWorker.start()
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Problemas na inicialização ou processamento worker uau customer"
+    const message = error instanceof Error ? error.message : "Problemas na inicialização ou processamento worker ERP Customer"
     Console({ type: "error", message });
     ConsoleData({ type: "error", data: error })
   }
 }, {
-  name: "EXECUÇÃO ETL UAU CUSTOMER WORKER",
+  name: "EXECUÇÃO ETL ERP CUSTOMER WORKER",
   timezone: "America/Sao_Paulo"
 })
 
@@ -33,35 +33,47 @@ cron.schedule('0 5 * * *', async () => {
 cron.schedule('0 5-23 * * 1-6', async () => {
   Console({ type: "log", message: "⏰ Cron disparado: Iniciando ETL de Obras" })
   try {
-    await obraUauWorker.start()
+    await developmentErpWorker.start()
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Problemas na inicialização ou processamento worker uau obra"
+    const message = error instanceof Error ? error.message : "Problemas na inicialização ou processamento worker ERP Development"
     Console({ type: "error", message });
     ConsoleData({ type: "error", data: error })
   }
 }, {
-  name: "EXECUÇÃO ETL UAU OBRA WORKER",
+  name: "EXECUÇÃO ETL ERP Development WORKER",
   timezone: "America/Sao_Paulo"
 })
 
 
 // UNIDADE → a cada hora (05h–23h), segunda a sábado
 cron.schedule('0 5-23 * * 1-6', async () => {
-  Console({ type: "log", message: "⏰ Cron disparado: Iniciando ETL de Unidades" })
+  Console({ type: "log", message: "⏰ Cron disparado: Iniciando ETL de Units" })
   try {
-    await unidadeUauWorker.start()
+    await unitsErpWorker.start()
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Problemas na inicialização ou processamento worker uau unidade"
+    const message = error instanceof Error ? error.message : "Problemas na inicialização ou processamento worker ERP Units"
     Console({ type: "error", message });
     ConsoleData({ type: "error", data: error })
   }
 }, {
-  name: "EXECUÇÃO ETL UAU UNIDADE WORKER",
+  name: "EXECUÇÃO ETL ERP UNITS WORKER",
   timezone: "America/Sao_Paulo"
 })
 
 
-// Para testes manuais: substitua o worker desejado e rode `npm run etl`
-async function test() {
-  await customerUauWorker.start()
+async function runFirstInitial() {
+  console.time("⏰ ETL Inicial ⏰")
+  Console({ type: "log", message: "⏰ ETL Inicial: Iniciando ETL GERAL ⏰" })
+  try {
+    await customerErpWorker.start()
+    await developmentErpWorker.start()
+    await unitsErpWorker.start()
+    console.timeEnd("⏰ ETL Inicial ⏰")
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Problemas na inicialização ou processamento worker ERP Customer"
+    Console({ type: "error", message });
+    ConsoleData({ type: "error", data: error })
+  }
 }
+
+(async () => await runFirstInitial())()

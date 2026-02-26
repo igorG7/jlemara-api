@@ -6,6 +6,8 @@ import pendingIssuesRoutes from "./pendingissues.routes";
 import { verifyToken } from "../Middlewares/Auth/verifyToken";
 import customerRoutes from "./customer.routes";
 import saleTeamRoutes from "./sale.team.routes";
+import testRoutes from "./test.routes";
+
 const routes = Router();
 
 
@@ -15,6 +17,8 @@ routes.use("/pendingissues", pendingIssuesRoutes);
 routes.use("/customer", customerRoutes);
 routes.use("/sale-team", saleTeamRoutes);
 
+// Rotas de teste — remover antes de produção
+routes.use("/test", testRoutes);
 
 
 export default routes;
