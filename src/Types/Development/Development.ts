@@ -1,7 +1,7 @@
 import { IInfrastructure } from "./Infrastructure";
 import { IAddress } from "./Address";
 import { IInfosSite } from "./InfoSite";
-import { IPhoto } from "./Photo";
+import { IPhoto } from "../Photo/Photo";
 
 export interface IDevelopment {
   development_code: string; // Cod_obr
