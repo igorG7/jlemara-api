@@ -121,6 +121,44 @@ class UnitController {
       });
     }
   }
+
+  async removePhoto(req: Request, res: Response) {
+    try {
+      const { id, public_id } = req.body;
+
+      const updatedUnit = await Unit.findByIdAndUpdate(
+        id,
+        {
+          $pull: { photos: { public_id: public_id } },
+          updatedAt: new Date(),
+        },
+        { new: true },
+      );
+
+      if (!updatedUnit) {
+        Console({ type: "warn", message: "Unidade não encontrada." });
+
+        return res.status(404).json({
+          message: "Unidade não encontrada.",
+          error: null,
+        });
+      }
+
+      Console({ type: "success", message: "Foto removida com sucesso!" });
+
+      return res.status(200).json({
+        message: "Foto removida com sucesso!",
+        data: updatedUnit,
+      });
+    } catch (error) {
+      Console({ type: "error", message: "Erro interno inesperado." });
+
+      return res.status(500).json({
+        message: "Erro interno inesperado.",
+        error,
+      });
+    }
+  }
 }
 
 export default new UnitController();
