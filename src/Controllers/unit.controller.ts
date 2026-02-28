@@ -18,9 +18,16 @@ class UnitController {
 
   async searchAvaliables(req: Request, res: Response) {
     try {
+      const page = Number(req.params.page) || 1;
+      const limit = Number(req.params.limit) || 5;
+
       Console({ type: "log", message: "Buscando unidades disponíveis." });
 
-      const units = await Unit.find({ unit_status: 0 }).lean();
+      const units = await Unit.find(
+        { unit_status: 0 },
+        {},
+        { limit, skip: (page - 1) * limit },
+      ).lean();
 
       if (!units.length) {
         Console({ type: "warn", message: "Nenhuma unidade encontrada." });
@@ -48,9 +55,16 @@ class UnitController {
     try {
       const query = req.body;
 
+      const page = Number(req.params.page) || 1;
+      const limit = Number(req.params.limit) || 5;
+
       Console({ type: "log", message: "Buscando unidade." });
 
-      const units = await Unit.find(query).lean();
+      const units = await Unit.find(
+        query,
+        {},
+        { limit, skip: (page - 1) * limit },
+      ).lean();
 
       if (!units.length) {
         Console({ type: "warn", message: "Nenhuma unidade encontrada." });
