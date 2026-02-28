@@ -8,7 +8,7 @@ const PhotosSchema = new Schema<IPhoto>(
     url: { type: String, trim: true },
     caption: { type: String, trim: true },
     visibility: { type: Boolean },
-    public_id: { type: String },
+    public_id: { type: String, unique: true },
   },
   { _id: false },
 );
