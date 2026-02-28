@@ -13,8 +13,13 @@ const routes = Router();
 routes.post("/create", Unit.createTemp);
 
 // Rotas de busca (GET/POST) - POST está sendo utilizado em caso de filtros mais complexos
-routes.post("/search", validateFindUnits, Unit.findUnits);
-routes.get("/avaliables", Unit.searchAvaliables);
+routes.post(
+  "/search/page/:page/limit/:limit",
+  validateFindUnits,
+  Unit.findUnits,
+);
+
+routes.get("/avaliables/page/:page/limit/:limit", Unit.findAvaliables);
 
 // Rotas de atualização (PATCH/PUT)
 routes.patch("/update", validateAddPhoto, Unit.updateUnit);
