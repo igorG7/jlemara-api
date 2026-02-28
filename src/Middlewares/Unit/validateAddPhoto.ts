@@ -22,7 +22,7 @@ import Console from "../../Lib/Console";
  * @returns {Response | void} Retorna uma resposta HTTP 400 em caso de erro ou chama `next()` em caso de sucesso.
  */
 
-export const validateUnitUpdate = (
+export const validateAddPhoto = (
   req: Request,
   res: Response,
   next: NextFunction,
