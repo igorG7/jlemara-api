@@ -16,7 +16,7 @@ class UnitController {
     }
   }
 
-  async searchAvaliables(req: Request, res: Response) {
+  async findAvaliables(req: Request, res: Response) {
     try {
       const page = Number(req.params.page) || 1;
       const limit = Number(req.params.limit) || 5;
