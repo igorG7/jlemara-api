@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 
 import Unit from "../Models/Unit";
 import Console from "../Lib/Console";
-import { error } from "console";
+import { log } from "console";
 
 class UnitController {
   async createTemp(req: Request, res: Response) {
@@ -149,6 +149,37 @@ class UnitController {
       return res.status(200).json({
         message: "Foto removida com sucesso!",
         data: updatedUnit,
+      });
+    } catch (error) {
+      Console({ type: "error", message: "Erro interno inesperado." });
+
+      return res.status(500).json({
+        message: "Erro interno inesperado.",
+        error,
+      });
+    }
+  }
+
+  async updatePhoto(req: Request, res: Response) {
+    try {
+      const { id, photo } = req.body;
+
+      Console({ type: "log", message: "Atualizando foto de unidade." });
+
+      const updateUnit = await Unit.findOneAndUpdate(
+        { _id: id },
+        { $set: { "photos.$[photo]": photo } },
+        { new: true, arrayFilters: [{ "photo.public_id": photo.public_id }] },
+      );
+
+      Console({
+        type: "success",
+        message: "Foto de Unidade atualizada com sucesso!",
+      });
+
+      return res.status(200).json({
+        message: "Foto de Unidade atualizada com sucesso!",
+        data: updateUnit,
       });
     } catch (error) {
       Console({ type: "error", message: "Erro interno inesperado." });
