@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 
 import Unit from "../Models/Unit";
 import Console from "../Lib/Console";
-import { log } from "console";
 
 class UnitController {
   async createTemp(req: Request, res: Response) {
