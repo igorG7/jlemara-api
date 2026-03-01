@@ -3,22 +3,35 @@ import { Router } from "express";
 
 import userRoutes from "./user.routes";
 import pendingIssuesRoutes from "./pendingissues.routes";
-import { verifyToken } from "../Middlewares/Auth/verifyToken";
 import customerRoutes from "./customer.routes";
 import saleTeamRoutes from "./sale.team.routes";
-import testRoutes from "./test.routes";
+
+
+
+
 
 const routes = Router();
 
 
+
+// * + import { verifyToken } from "../Middlewares/Auth/verifyToken";
+// ? | Futura rota responsavel apenas por autenticação
+// * + routes.use("/auth", authRoutes);
+// ! | com isso, garantimos a segurança nas proximas rotas sem ter que
+// ! | replicar o verifyToken como middleware em todas as functions
+// * + routes.use(verifyToken);
+
+
+
 routes.use("/users", userRoutes);
-// routes.use(verifyToken);
 routes.use("/pendingissues", pendingIssuesRoutes);
 routes.use("/customer", customerRoutes);
 routes.use("/sale-team", saleTeamRoutes);
 
-// Rotas de teste — remover antes de produção
-routes.use("/test", testRoutes);
+
+// * + import testRoutes from "./test.routes";
+// ! | Rotas de teste integração com erp — remover antes de produção
+// * | routes.use("/erpTest", testRoutes);
 
 
 export default routes;

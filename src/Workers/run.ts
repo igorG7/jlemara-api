@@ -76,4 +76,5 @@ async function runFirstInitial() {
   }
 }
 
-(async () => await runFirstInitial())()
+
+(async () => process.env.RUN_INITIAL === 'true' && await runFirstInitial())()

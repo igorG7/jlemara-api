@@ -17,7 +17,7 @@ module.exports = {
       }
     },
     {
-      // Workers ETL UAU (customer, obra, unidade) — agendados via node-cron interno
+      // Workers ETL ERP (customer, obra, unidade) — agendados via node-cron interno
       name: "jlemara-etl",
       script: "dist/src/Workers/run.js",
       instances: 1,
