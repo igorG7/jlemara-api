@@ -1,3 +1,12 @@
+export type ChangeUnitStatusPayload = {
+    empresa: number;
+    produto: number;
+    personalizacao: number;
+    newStatus: number;
+    newSubStatus: number;
+    motivo: string;
+};
+
 export type ResponseFindAllUnits = {
     Empresa_unid: number;
     Prod_unid: number;

@@ -93,7 +93,7 @@ export default class DevelopmentErpWorker {
              *
              * Dado disponível: obrasInfoCompleta (ResponseFindObraWithCode[])
              * Quantidade:      obrasInfoCompleta.length registros prontos para upsert
-             * Referência tipo: src/Services/Uau/Obra/uau.obra.types.ts
+             * Referência tipo: src/Services/Erp/Development/erp.development.types.ts
              * ============================================================ */
 
             console.timeEnd("⏳ tempo total persistencia no backend ⏳");

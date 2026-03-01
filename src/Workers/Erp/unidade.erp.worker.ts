@@ -1,9 +1,7 @@
 import Console, { ConsoleData } from "../../Lib/Console";
-import { ResponseFindAllObras } from "../../Services/Uau/Obra/uau.obra.types";
-import { ResponseFindAllUnidades } from "../../Services/Uau/Unidade/uau.unidade.types";
-import UauObraService from "../../Services/Uau/Obra/uau.obra.service";
 import Erp from "../../Services/Erp";
-import { ResponseFindAllUnits } from "Services/Erp/Unit/erp.unit.types";
+import { ResponseFindAllDevelopments } from "../../Services/Erp/Development/erp.development.types";
+import { ResponseFindAllUnits } from "../../Services/Erp/Unit/erp.unit.types";
 
 export default class UnitErpWorker {
 
@@ -34,7 +32,7 @@ export default class UnitErpWorker {
             const CHUNK_SIZE = 50; // Processa CHUNK_SIZE obras em paralelo por vez
 
             console.time("⏳ tempo busca obras ⏳");
-            const obrasErp = await this.developmentErp.findAllDevelopments() as ResponseFindAllObras[];
+            const obrasErp = await this.developmentErp.findAllDevelopments() as ResponseFindAllDevelopments[];
             console.timeEnd("⏳ tempo busca obras ⏳");
 
             const totalObras = obrasErp.length;
@@ -98,7 +96,7 @@ export default class UnitErpWorker {
              * Dado disponível: todasAsUnidades (ResponseFindAllUnidades[])
              * Quantidade:      todasAsUnidades.length registros prontos para upsert
              * Chave de upsert: Prod_unid + NumPer_unid (par único por unidade no UAU)
-             * Referência tipo: src/Services/Uau/Unidade/uau.unidade.types.ts
+             * Referência tipo: src/Services/Erp/Unit/erp.unit.types.ts
              * ============================================================ */
 
             console.timeEnd("⏳ tempo total persistencia no backend ⏳");

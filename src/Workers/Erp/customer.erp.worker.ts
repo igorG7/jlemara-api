@@ -1,4 +1,4 @@
-//src\Workers\Uau\customer.uau.worker.ts
+//src\Workers\Erp\customer.erp.worker.ts
 import Console, { ConsoleData } from "../../Lib/Console";
 import { CustomerWithSale } from "../../Services/Erp/Customer/erp.customer.types";
 import { AddressType, CustomerType } from "Types/CustomerTypes";
