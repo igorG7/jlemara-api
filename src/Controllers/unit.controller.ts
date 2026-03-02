@@ -1,9 +1,31 @@
 import { Request, Response } from "express";
 
 import Unit from "../Models/Unit";
-import Console from "../Lib/Console";
+import Console, { ConsoleData } from "../Lib/Console";
+import { UnitDTO } from "../DTOs/Unit/UnitDTOs";
+
+import { IUnit } from "../Types/Unit/Unit";
+import { ResponseUnitUauType } from "../Types/Unit/ResponseUnitUau";
 
 class UnitController {
+  isEqual(a: any, b: any) {
+    return JSON.stringify(a ?? null) === JSON.stringify(b ?? null);
+  }
+
+  generateSyncPatch(currentData: any, newData: any) {
+    const mergedData: Record<string, any> = {};
+
+    for (const [key, value] of Object.entries(newData)) {
+      if (value === undefined) continue;
+
+      const currentValue = currentData?.[key];
+
+      if (!this.isEqual(currentValue, value)) mergedData[key] = value;
+    }
+
+    return mergedData;
+  }
+
   async createTemp(req: Request, res: Response) {
     try {
       const body = req.body;
@@ -16,12 +38,98 @@ class UnitController {
     }
   }
 
+  async registerUnit(data: IUnit) {
+    try {
+      Console({ type: "log", message: "Cadastrando/atualizando unidade." });
+
+      const { unit_code } = data;
+
+      if (!unit_code) throw new Error("Código de unidade não informado");
+
+      const currentData = await Unit.findOne({ unit_code }).lean();
+
+      if (!currentData) {
+        const unit = await Unit.create(data);
+        return {
+          status: 201,
+          message: "Unidade cadastrada/atualizada com sucesso!",
+          data: unit,
+        };
+      }
+
+      const newPatch = this.generateSyncPatch(currentData, data);
+
+      if (Object.keys(newPatch).length === 0) return currentData;
+
+      const updatedUnit = await Unit.findOneAndUpdate(
+        { unit_code },
+        { $set: { newPatch } },
+        { new: true },
+      ).lean();
+
+      return {
+        status: 200,
+        message: "Unidade cadastrada/atualizada com sucesso!",
+        data: updatedUnit,
+      };
+    } catch (error) {
+      return {
+        status: 500,
+        message: "Erro ao cadastrar/atualizar obra.",
+        error,
+        data: null,
+      };
+    }
+  }
+
+  async registerManyUits(data: ResponseUnitUauType[]) {
+    Console({
+      type: "log",
+      message: "Cadastrando/atualizando unidades em lote.",
+    });
+
+    try {
+      if (!data?.length) return [];
+
+      const ops = data
+        .filter((p) => !!p?.Identificador_unid)
+        .map((p) => {
+          const incoming = UnitDTO.format(p);
+          return {
+            updateOne: {
+              filter: { unit_identifier: incoming.unit_identifier },
+              update: { $set: incoming },
+              upsert: true,
+            },
+          };
+        });
+
+      if (!ops.length) return [];
+
+      await Unit.bulkWrite(ops, { ordered: false });
+
+      const ids = data
+        .map((p) => p?.Identificador_unid)
+        .filter(Boolean) as string[];
+
+      const units = await Unit.find({ unit_identifier: { $in: ids } }).lean();
+      return units.map(normalizeId);
+    } catch (error) {
+      Console({
+        type: "error",
+        message: "Erro ao cadastrar/atualizar units em lote.",
+      });
+      ConsoleData({ type: "error", data: error });
+      return null;
+    }
+  }
+
   async findAvaliables(req: Request, res: Response) {
     try {
       const page = Number(req.params.page) || 1;
       const limit = Number(req.params.limit) || 5;
 
-      Console({ type: "log", message: "Buscando unidades disponíveis." });
+      Console({ type: "log", message: "Buscando Units disponíveis." });
 
       const units = await Unit.find(
         { unit_status: 0 },
