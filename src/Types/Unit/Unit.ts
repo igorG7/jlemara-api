@@ -11,15 +11,15 @@ export interface IUnit {
   registration_date: Date; // Data de cadastro da unidade no UAU
   product_type_code: string; // Identifica o tipo do produto (casa, apartamento, lote, etc)
   attachment_count: number; // Contagem de anexos e informações viculadas a unidade
-  price: number; // Quadra da unidade
+  price: number; // Valor da unidade
   block: string; // Quadra da unidade
   lot: string; // Lote (terreno)
   unit_identifier: string; // Cógido de identificação composto por: número do lote, abreviação do nome do bairro e quadra
-  photos: IPhoto[]; // Fotos
-  district: string; // Bairro
-  city: string; // Cidade
-  latitude: string; // Valor latitude
-  longitude: string; // Valor longitude
+  photos?: IPhoto[]; // Fotos
+  district: string | null; // Bairro
+  city: string | null; // Cidade
+  latitude: string | null; // Valor latitude
+  longitude: string | null; // Valor longitude
   sale_number: string; // Identifica se possui venda atrelado. 0 é o padrão e não corresponde a nenhuma venda, se diferente possui venda
   uau_ref: string; // Concatenação da empresa - obra - unidade
 }
