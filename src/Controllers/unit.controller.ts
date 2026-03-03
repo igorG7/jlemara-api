@@ -50,6 +50,12 @@ class UnitController {
 
       if (!currentData) {
         const unit = await Unit.create(data);
+
+        Console({
+          type: "success",
+          message: "Unidade cadastrada/atualizada com sucesso!",
+        });
+
         return {
           status: 201,
           message: "Unidade cadastrada/atualizada com sucesso!",
@@ -67,12 +73,22 @@ class UnitController {
         { new: true },
       ).lean();
 
+      Console({
+        type: "success",
+        message: "Unidade cadastrada/atualizada com sucesso!",
+      });
+
       return {
         status: 200,
         message: "Unidade cadastrada/atualizada com sucesso!",
         data: updatedUnit,
       };
-    } catch (error) {
+    } catch (error: unknown) {
+      Console({
+        type: "error",
+        message: error instanceof Error ? error.message : "Erro critico",
+      });
+
       return {
         status: 500,
         message: "Erro ao cadastrar/atualizar obra.",
@@ -82,7 +98,7 @@ class UnitController {
     }
   }
 
-  async registerManyUits(data: ResponseUnitUauType[]) {
+  async registerManyUnits(data: ResponseUnitUauType[]) {
     Console({
       type: "log",
       message: "Cadastrando/atualizando unidades em lote.",
@@ -113,7 +129,13 @@ class UnitController {
         .filter(Boolean) as string[];
 
       const units = await Unit.find({ unit_identifier: { $in: ids } }).lean();
-      return units.map(normalizeId);
+
+      Console({
+        type: "success",
+        message: "Unidades cadastradas/atualizadas com sucesso!",
+      });
+
+      return units;
     } catch (error) {
       Console({
         type: "error",
@@ -130,7 +152,7 @@ class UnitController {
       const limit = Number(req.params.limit) || 5;
 
       Console({ type: "log", message: "Buscando Units disponíveis." });
-
+      // * Vericar sobre o tamanho total da coleção.
       const units = await Unit.find(
         { unit_status: 0 },
         {},
@@ -148,7 +170,11 @@ class UnitController {
       }
 
       Console({ type: "success", message: "Busca concluída com sucesso!" });
-      return res.status(200).json({ message: "", data: units });
+
+      return res.status(200).json({
+        message: "Busca concluída com sucesso!",
+        data: units,
+      });
     } catch (error) {
       Console({ type: "error", message: "Erro interno inesperado." });
 
