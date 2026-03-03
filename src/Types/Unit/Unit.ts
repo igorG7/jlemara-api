@@ -18,8 +18,8 @@ export interface IUnit {
   photos?: IPhoto[]; // Fotos
   district: string | null; // Bairro
   city: string | null; // Cidade
-  latitude: string | null; // Valor latitude
-  longitude: string | null; // Valor longitude
+  latitude?: string | null; // Valor latitude
+  longitude?: string | null; // Valor longitude
   sale_number: string; // Identifica se possui venda atrelado. 0 é o padrão e não corresponde a nenhuma venda, se diferente possui venda
   uau_ref: string; // Concatenação da empresa - obra - unidade
 }
