@@ -13,16 +13,19 @@ export class UnitDTO {
 
   static formatToUauRef(
     company: number,
-    development_code: string,
+    product_unit: number,
     unit_code: number,
+    development_code: string,
   ) {
-    return `${company}-${development_code}-${unit_code}`;
+    return `${company}-${product_unit}-${unit_code}-${development_code}`;
   }
 
   static format(data: ResponseUnitUauType): IUnit {
-    const block = UnitDTO.toStr(data.C3_unid) || UnitDTO.toStr(data.C4_unid);
+    const block =
+      UnitDTO.toStr(data.C1_unid) || UnitDTO.toStr(data.C4_unid).split("-")[0];
 
-    const lot = UnitDTO.toStr(data.C1_unid) || UnitDTO.toStr(data.C2_unid);
+    const lot =
+      UnitDTO.toStr(data.C2_unid) || UnitDTO.toStr(data.C2_unid).split("-")[2];
 
     const unitFormated: IUnit = {
       development_code: data.Obra_unid,
@@ -30,27 +33,28 @@ export class UnitDTO {
       product_unit: data.Prod_unid,
       unit_code: data.NumPer_unid,
       unit_status: data.Vendido_unid > 0 ? 1 : 0,
-      category_status: data.NumCategStatus_unid ?? null,
+      category_status:
+        String(data.NumCategStatus_unid) === "null"
+          ? 0
+          : data.NumCategStatus_unid,
       attachment_count: data.anexos_unid,
       block: block,
       lot: lot,
-      city: (UnitDTO.cleanNullString(data.C5_unid) as string | null) ?? null,
+      city: (UnitDTO.cleanNullString(data.C7_unid) as string | null) ?? null,
       district:
         (UnitDTO.cleanNullString(data.C6_unid) as string | null) ?? null,
-      latitude:
-        (UnitDTO.cleanNullString(data.C7_unid) as string | null) ?? null,
-      longitude:
-        (UnitDTO.cleanNullString(data.C8_unid) as string | null) ?? null,
+
       unit_identifier: data.Identificador_unid,
-      price: data.ValPreco_unid,
+      price: String(data.C13_unid) === "null" ? 0 : Number(data.C13_unid),
       product_type_code: data.CodTipProd_unid,
       registration_date: new Date(data.DataCad_unid),
       sale_number: data.Num_Ven,
       quantity_available: data.Qtde_unid,
       uau_ref: UnitDTO.formatToUauRef(
         data.Empresa_unid,
-        data.Obra_unid,
         data.Prod_unid,
+        data.NumPer_unid,
+        data.Obra_unid,
       ),
     };
 
