@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import Console from "../Lib/Console";
-import Customer from "../Models/Customer";
-import { CustomerType } from "../Types/CustomerTypes";
+import Console from "../../Lib/Console";
+import Customer from "./infra/customer";
+import { CustomerType } from "./domain/customer.interface";
 
 const notReturn = {
   password: 0,

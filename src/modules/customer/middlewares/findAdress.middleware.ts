@@ -1,16 +1,13 @@
 import { Request, Response, NextFunction } from "express";
-import Console from "../../Lib/Console";
+import Console from "../../../Lib/Console";
 
 /**
- * Middleware responsável por validar a chave enviada na busca de endereços de um grupo de clientes.
+ * Middleware responsável por validar a chave enviada na busca de um endereço de cliente.
  * Regras de validação:
- * - O parâmetro `codes` é obrigatório e deve ser enviado.
- * - A lista de códigos 'codes' não pode estar vazia.
- * - Os códigos fornecidos devem ser transformados em tipo 'number' sem gerar 'NaN'.
+ * - O parâmetro `code_person` é obrigatório e deve ser enviado.
  *
  * Comportamento:
- * - Retorna HTTP 400 se o 'codes' não for informado ou não possuir nenhum código.
- * - Retorna HTTP 400 se algum código gerar 'NaN' após transformação.
+ * - Retorna HTTP 400 se o 'code_person' não for informado.
  * - Caso todas as validações passem, a requisição segue para o próximo middleware
  *
  * @param {Request} req - Objeto da requisição do Express contendo o corpo com os dados de atualização.
@@ -20,27 +17,18 @@ import Console from "../../Lib/Console";
  * @returns {Response | void} Retorna uma resposta HTTP 400 em caso de erro ou chama `next()` em caso de sucesso.
  */
 
-export const validateFindManyAddress = (
+export const findAdress = (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
-  const { codes } = req.body;
+  const code_person = req.params.code_person;
 
-  if (!codes.length) {
+  if (!code_person) {
     Console({ type: "error", message: "Nenhum Código Pessoa foi fornecido." });
     return res
       .status(400)
       .json({ message: "Nenhum Código Pessoa foi fornecido.", error: null });
-  }
-
-  for (const code of codes) {
-    if (!Number(code)) {
-      return res.status(400).json({
-        message: `O código '${code}' deve conter apenas números.`,
-        error: null,
-      });
-    }
   }
 
   next();

@@ -1,13 +1,10 @@
 import { Router } from "express";
-
-import Customer from "../Controllers/customer.controller";
-
-import { validateFindCustomer } from "../Middlewares/Customer/validateFindCustomer";
-import { validateCustomerUpdate } from "../Middlewares/Customer/validateCustomerUpdate";
-import { validateFindAddress } from "../Middlewares/Customer/validateFindAddress";
-import { validateFindManyAddress } from "../Middlewares/Customer/validateFindManyAddress";
-import { validateCustomerPhoneUpdate } from "../Middlewares/Customer/validateCustomerUpdatePhone";
-
+import Customer from './customer.controller'
+import { findAdress } from "./middlewares/findAdress.middleware";
+import { findCustomer } from "./middlewares/find.middleware";
+import { findManyAdress } from "./middlewares/findMany.middleware";
+import { updateCustomer } from "./middlewares/update.middleware";
+import { updatePhoneCustomer } from "./middlewares/updatePhone.middleware";
 const routes = Router();
 routes.post("/create", Customer.createClient); // * Temporario
 
@@ -23,25 +20,25 @@ routes.get("/search/:name", Customer.findCustomerByPartialName);
 
 routes.get(
   "/address/:code_person",
-  validateFindAddress,
+  findAdress,
   Customer.findAddressCustomer,
 );
 
 // Rotas de busca que utlizam filtros mais detalhadas (POST).
 // A utilização de POST de faz necessária para um envio de dados mais complexo para realizar a busca.
-routes.post("/search", validateFindCustomer, Customer.findCustomer);
+routes.post("/search", findCustomer, Customer.findCustomer);
 
 routes.post(
   "/addres",
-  validateFindManyAddress,
+  findManyAdress,
   Customer.findManyAddressCustomer,
 );
 
 // Rotas de atualização (PUT/PATCH)
-routes.patch("/update", validateCustomerUpdate, Customer.updateCustomer);
+routes.patch("/update", updateCustomer, Customer.updateCustomer);
 routes.patch(
   "/update/phone",
-  validateCustomerPhoneUpdate,
+  updatePhoneCustomer,
   Customer.updatePhoneCustomer,
 );
 

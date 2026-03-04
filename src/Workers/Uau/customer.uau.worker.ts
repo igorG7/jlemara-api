@@ -1,11 +1,11 @@
 //src\Workers\Uau\customer.uau.worker.ts
 import Console, { ConsoleData } from "../../Lib/Console";
-import { CustomersWithSale } from "../../Services/Uau/Customer/uau.customer.dto";
-import { AddressType, CustomerType } from "Types/CustomerTypes";
+import { CustomersWithSale } from "../../modules/customer/integration/customer.interface.integration";
+import { AddressType, CustomerType } from "modules/customer/domain/customer.interface";
 import parseBRDate from "../../Utils/dateParser";
 import CustomerController from "../../Controllers/customer.controller";
 import mountCustomerAdress from "./utils/mountCustomerAdress";
-import UauCustomerService from "Services/Uau/Customer/uau.costumer.service";
+import UauCustomerService from "modules/customer/integration/customer.integration";
 
 
 export default class CustomerUauWorker {

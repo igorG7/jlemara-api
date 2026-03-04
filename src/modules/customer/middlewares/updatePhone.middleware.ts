@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import Console from "../../Lib/Console";
+import Console from "../../../Lib/Console";
 
 /**
  * Middleware responsável por validar as chaves enviadas na atualização de um cliente.
@@ -19,7 +19,7 @@ import Console from "../../Lib/Console";
  * @returns {Response | void} Retorna uma resposta HTTP 400 em caso de erro ou chama `next()` em caso de sucesso.
  */
 
-export const validateCustomerPhoneUpdate = (
+export const updatePhoneCustomer = (
   req: Request,
   res: Response,
   next: NextFunction,

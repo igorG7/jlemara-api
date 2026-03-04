@@ -1,12 +1,11 @@
 // src\Services\Uau\Customer\uau.customer.service.ts
 import uau from "../../../Lib/Uau";
-
 import RedisController from "../../../Controllers/redis.controller"
-
-import { RecordPhoneCustomerDTO, RecordCustomerDTO, ResponseCustomerPhones, DeleteCustomerPhones, ResponseFindCustomerWithPersonCode, ResponseFindCustomerWithCPF, CustomerWithCodeOrCPF, ResponseCustomerFindUnits, CustomerAddress, ResponseCustomerFindAdress, CustomersWithSale, ResponseFindCustomersWithSale } from "./uau.customer.dto";
 import Console, { ConsoleData } from "../../../Lib/Console";
 import parseBRDate from "../../../Utils/dateParser";
-import { customerValidateCodPes, customerValidateCPF } from "./uau.customer.validation";
+import { validateCpf } from "modules/utils/validate.cpf.utils";
+import { CustomerAddress, CustomersWithSale, CustomerWithCodeOrCPF, DeleteCustomerPhones, RecordCustomerDTO, RecordPhoneCustomerDTO, ResponseCustomerFindAdress, ResponseCustomerFindUnits, ResponseCustomerPhones, ResponseFindCustomersWithSale, ResponseFindCustomerWithCPF, ResponseFindCustomerWithPersonCode } from "./customer.interface.integration";
+import { validateCustomerCode } from "modules/utils/validate.customer.code";
 
 export default class UauCustomerService {
   private redis = new RedisController();
@@ -17,7 +16,7 @@ export default class UauCustomerService {
 
     const cpf = String().replace(/\D/g, "")
 
-    await customerValidateCPF(cpf)
+    await validateCpf(cpf)
 
     try {
       const lockAcquired = await this.redis.setCustomerLock(cpf);
@@ -105,7 +104,7 @@ export default class UauCustomerService {
 
   async recordPhoneCustomer(cod_pes: number, phones: RecordPhoneCustomerDTO[]) {
 
-    await customerValidateCodPes(cod_pes)
+    await validateCustomerCode(cod_pes)
 
     try {
       const lockAcquired = await this.redis.setCustomerLock(String(cod_pes));
@@ -159,7 +158,7 @@ export default class UauCustomerService {
 
   async findPhonesCustomer(cod_pes: number) {
 
-    await customerValidateCodPes(cod_pes)
+    await validateCustomerCode(cod_pes)
 
     try {
       const lockAcquired = await this.redis.setCustomerLock(String(cod_pes));
@@ -202,7 +201,7 @@ export default class UauCustomerService {
 
   async deletePhonecustomer(cod_pes: number, phones: DeleteCustomerPhones[]) {
 
-    await customerValidateCodPes(cod_pes)
+    await validateCustomerCode(cod_pes)
 
     try {
 
@@ -245,7 +244,7 @@ export default class UauCustomerService {
 
   async findCustomerWithCode(cod_pes: number) {
 
-    await customerValidateCodPes(cod_pes)
+    await validateCustomerCode(cod_pes)
 
     try {
       const lockAcquired = await this.redis.setCustomerLock(String(cod_pes));
@@ -315,7 +314,7 @@ export default class UauCustomerService {
 
   async findcustomerWithCPF(cpf_cnpj: string, status: number = 0) {
 
-    await customerValidateCPF(cpf_cnpj)
+    await validateCpf(cpf_cnpj)
 
     try {
       const lockAcquired = await this.redis.setCustomerLock(String(cpf_cnpj));
@@ -359,7 +358,7 @@ export default class UauCustomerService {
 
   async findUnitsCustomer(cod_pes: number) {
 
-    await customerValidateCodPes(cod_pes)
+    await validateCustomerCode(cod_pes)
 
     try {
 
@@ -402,7 +401,7 @@ export default class UauCustomerService {
 
   async findAdressCustomer(cod_pes: number, tipoEndereco: number = 0) {
 
-    await customerValidateCodPes(cod_pes)
+    await validateCustomerCode(cod_pes)
 
     try {
 

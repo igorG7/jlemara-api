@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-import { CustomerType } from "../Types/CustomerTypes";
+import { CustomerType } from "../domain/customer.interface";
 
 const CustomerSchema = new Schema<CustomerType>(
   {
