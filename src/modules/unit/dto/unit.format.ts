@@ -1,5 +1,5 @@
-import { IUnit } from "../../Types/Unit/Unit";
-import { ResponseUnitUauType } from "../../Types/Unit/ResponseUnitUau";
+import { ResponseUnitUauType } from "Types/Unit/ResponseUnitUau";
+import { IUnit } from "../domain/unit.interface";
 
 export class UnitDTO {
   static toStr(value: unknown) {

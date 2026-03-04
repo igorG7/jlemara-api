@@ -1,8 +1,8 @@
-import Unit from "../../Controllers/unit.controller";
+import Unit from "../../modules/unit/unit.controller";
 import Console, { ConsoleData } from "../../Lib/Console";
-import UauUnidadeService from "../../Services/Uau/Unidade/uau.unidade.service";
+import UauUnidadeService from "../../modules/unit/integration/unit.integration";
+import { UnitDTO } from "modules/unit/dto/unit.format";
 
-import { UnitDTO } from "../../DTOs/Unit/UnitDTOs";
 
 export default class UnitWorker {
   private isRunning = false;

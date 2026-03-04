@@ -7,7 +7,7 @@ import { verifyToken } from "../Middlewares/Auth/verifyToken";
 import customerRoutes from "./customer.routes";
 import developmentRoutes from "./development.routes";
 import saleTeamRoutes from "./sale.team.routes";
-import unitRoutes from "./unit.routes";
+import unitRoutes from "../modules/unit/unit.routes";
 const routes = Router();
 
 routes.use("/users", userRoutes);

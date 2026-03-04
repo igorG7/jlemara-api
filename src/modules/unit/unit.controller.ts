@@ -1,11 +1,9 @@
 import { Request, Response } from "express";
-
-import Unit from "../Models/Unit";
-import Console, { ConsoleData } from "../Lib/Console";
-import { UnitDTO } from "../DTOs/Unit/UnitDTOs";
-
-import { IUnit } from "../Types/Unit/Unit";
-import { ResponseUnitUauType } from "../Types/Unit/ResponseUnitUau";
+import Unit from "./infra/Unit";
+import Console, { ConsoleData } from "../../Lib/Console";
+import { IUnit } from "./domain/unit.interface";
+import { ResponseUnitUauType } from "Types/Unit/ResponseUnitUau";
+import { UnitDTO } from "./dto/unit.format";
 
 class UnitController {
   isEqual(a: any, b: any) {
