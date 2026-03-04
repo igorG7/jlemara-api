@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 
-import { UserType } from "../../Models/User";
-import Console from "../../Lib/Console";
+import { UserType } from "../domain/user.interface";
+import Console from "../../../Lib/Console";
 
 /**
  * Middleware responsável por validar o corpo da requisição, garantindo que todas as chaves necessárias estejam presentes e contenham seus valores.

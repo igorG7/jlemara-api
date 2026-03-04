@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 
-import { FindUserBody } from "../../Controllers/user.controller";
-import Console from "../../Lib/Console";
+import { FindUserBody } from "../user.controller";
+import Console from "../../../Lib/Console";
 
 /**
  * Middleware responsável por validar se os dados necessários para busca estão sendo fornecidos.

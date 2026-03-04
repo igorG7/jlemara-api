@@ -1,10 +1,9 @@
 import { Request, Response } from "express";
-import Console from "../Lib/Console";
+import Console from "../../Lib/Console";
 import bcrypt from "bcryptjs";
 import jwt from 'jsonwebtoken'
-import User from "../Models/User";
-
-import { UserType } from "../Models/User";
+import User from "./infra/user";
+import { UserType } from "./domain/user.interface";
 
 export type AuthBody = { email: string; password: string };
 export type FindUserBody = { email?: string; id?: string };

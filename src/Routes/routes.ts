@@ -1,7 +1,7 @@
 // src/routes/routes.ts
 import { Router } from "express";
 
-import userRoutes from "./user.routes";
+import userRoutes from "../modules/user/user.routes";
 import pendingIssuesRoutes from "./pendingissues.routes";
 import { verifyToken } from "../Middlewares/Auth/verifyToken";
 import customerRoutes from "./customer.routes";

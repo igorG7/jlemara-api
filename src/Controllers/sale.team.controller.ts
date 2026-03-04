@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import Console, { ConsoleData } from "../Lib/Console";
 import Team, { SaleTeamType } from "../Models/SaleTeam";
-import User from "../Models/User";
+import User from "../modules/user/infra/user";
 
 class TeamController {
 

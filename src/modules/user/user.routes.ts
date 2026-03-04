@@ -1,15 +1,15 @@
 import { Router } from "express";
 
-import User from "../Controllers/user.controller";
+import User from "./user.controller";
 
 // Middlewares User
-import { hasUserData } from "../Middlewares/Users/userData";
-import { validateUpdateKeys } from "../Middlewares/Users/validateUpdateKeys";
-import { validateRegister } from "../Middlewares/Users/validateRegister";
-import { validateUpdatePass } from "../Middlewares/Users/validateUpdatePass";
-import { validateFindUser } from "../Middlewares/Users/validateFindUser";
-import { verifyToken } from "../Middlewares/Auth/verifyToken";
-import { validateFindUsersByRole } from "../Middlewares/Users/validateFindUsersByRole";
+import { hasUserData } from "./middlewares/data.middleware";
+import { validateUpdateKeys } from "./middlewares/updateKeys.middleware";
+import { validateRegister } from "./middlewares/register.middleware";
+import { validateUpdatePass } from "./middlewares/updatePass.middleware";
+import { validateFindUser } from "./middlewares/find.middleware";
+import { verifyToken } from "../../Middlewares/Auth/verifyToken";
+import { validateFindUsersByRole } from "./middlewares/findByRole.middleware";
 //
 
 const routes = Router();

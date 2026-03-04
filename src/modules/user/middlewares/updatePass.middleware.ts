@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 
-import Console from "../../Lib/Console";
-import { UpdatePassBody } from "../../Controllers/user.controller";
+import Console from "../../../Lib/Console";
+import { UpdatePassBody } from "../user.controller";
 
 /**
  * Middleware responsável por validar os dados recebidos para atualização de um usuário.

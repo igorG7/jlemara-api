@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 
-import { AuthBody } from "Controllers/user.controller";
-import Console from "../../Lib/Console";
+import { AuthBody } from "../user.controller";
+import Console from "../../../Lib/Console";
 
 /**
  * Middleware responsável por validar as credenciais de acesso de um usuário.

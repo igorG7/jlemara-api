@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 
-import Console from "../../Lib/Console";
-import { UpdateUserBody } from "../../Controllers/user.controller";
+import Console from "../../../Lib/Console";
+import { UpdateUserBody } from "../user.controller";
 
 /**
  * Middleware responsável por validar as chaves enviadas na atuaçização de um usuário.
