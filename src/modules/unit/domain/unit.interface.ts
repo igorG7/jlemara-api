@@ -1,4 +1,3 @@
-import { IPhoto } from "./photo.interface";
 
 export interface IUnit {
     company: number; // Empresa responsável
@@ -22,4 +21,11 @@ export interface IUnit {
     longitude?: string | null; // Valor longitude
     sale_number: string; // Identifica se possui venda atrelado. 0 é o padrão e não corresponde a nenhuma venda, se diferente possui venda
     uau_ref: string; // Concatenação da empresa - obra - unidade
+}
+
+export interface IPhoto {
+    url: string;
+    caption: string;
+    visibility: boolean;
+    public_id: string;
 }

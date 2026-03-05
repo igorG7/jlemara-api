@@ -1,8 +1,7 @@
 import { Router } from "express";
 
 import Unit from "./unit.controller";
-import { findUnits } from "./middlewares/unit.middleware";
-import { addPhoto, deletePhoto, unitPhoto, updatePhoto } from "./middlewares/photo.middleware";
+import { findUnits, addPhoto, deletePhoto, unitPhoto, updatePhoto } from "./middlewares/unit.middleware";
 
 
 const routes = Router();

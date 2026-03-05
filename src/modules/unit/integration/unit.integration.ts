@@ -1,6 +1,6 @@
-import { ResponseUnitUauType } from "../../../Types/Unit/ResponseUnitUau";
-import Console from "../../../Lib/Console";
-import uau from "../../../Lib/Uau";
+import Console from "../../utils/Console";
+import uau from "../../utils/Uau";
+import { ResponseUnitUauType } from "./unit.interface.integration";
 
 export default class UauUnidadeService {
   private api = uau;

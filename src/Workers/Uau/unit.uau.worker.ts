@@ -1,5 +1,5 @@
 import Unit from "../../modules/unit/unit.controller";
-import Console, { ConsoleData } from "../../Lib/Console";
+import Console, { ConsoleData } from "../../modules/utils/Console";
 import UauUnidadeService from "../../modules/unit/integration/unit.integration";
 import { UnitDTO } from "modules/unit/dto/unit.format";
 

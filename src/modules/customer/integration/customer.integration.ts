@@ -1,14 +1,14 @@
 // src\Services\Uau\Customer\uau.customer.service.ts
-import uau from "../../../Lib/Uau";
-import RedisController from "../../../Controllers/redis.controller"
-import Console, { ConsoleData } from "../../../Lib/Console";
-import parseBRDate from "../../../Utils/dateParser";
+import uau from "../../utils/Uau";
+import Console, { ConsoleData } from "../../utils/Console";
+import parseBRDate from "../../utils/dateParser";
 import { validateCpf } from "modules/utils/validate.cpf.utils";
 import { CustomerAddress, CustomersWithSale, CustomerWithCodeOrCPF, DeleteCustomerPhones, RecordCustomerDTO, RecordPhoneCustomerDTO, ResponseCustomerFindAdress, ResponseCustomerFindUnits, ResponseCustomerPhones, ResponseFindCustomersWithSale, ResponseFindCustomerWithCPF, ResponseFindCustomerWithPersonCode } from "./customer.interface.integration";
 import { validateCustomerCode } from "modules/utils/validate.customer.code";
+import RedisController from "modules/redis/redis.controller";
 
 export default class UauCustomerService {
-  private redis = new RedisController();
+  private redis = RedisController
   private api = uau;
 
 

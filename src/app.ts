@@ -1,9 +1,9 @@
 import express from "express";
 import cors from "cors";
-import './Lib/Redis'
-import ConnectionDB from "./Configs/ConnectionDB";
-import routes from "./Routes/routes";
+import './modules/redis/infra/redis'
+import ConnectionDB from "./db/ConnectionDB";
 import cookieParser from "cookie-parser";
+import routes from "./modules/routes/routes";
 class App {
   public app;
 

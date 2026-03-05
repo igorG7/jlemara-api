@@ -1,6 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-import { IPhoto } from "../domain/photo.interface";
-import { IUnit } from "../domain/unit.interface";
+import { IPhoto, IUnit } from "../domain/unit.interface";
 
 const PhotosSchema = new Schema<IPhoto>(
   {

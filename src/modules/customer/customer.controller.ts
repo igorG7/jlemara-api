@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import Console from "../../Lib/Console";
-import Customer from "./infra/customer";
+import Console from "../utils/Console";
+import Customer from "./infra/customer.model";
 import { CustomerType } from "./domain/customer.interface";
 
 const notReturn = {
@@ -136,7 +136,6 @@ class CustomerController {
     }
   }
 
-  // * Temporario
   async createClient(req: Request, res: Response) {
     try {
       const body = req.body;

@@ -1,4 +1,4 @@
-export type ResponseFindAllUnidades = {
+export type ResponseUnitUauType = {
   Empresa_unid: number;
   Prod_unid: number;
   NumPer_unid: number;
@@ -38,3 +38,4 @@ export type ResponseFindAllUnidades = {
   UnidadeVendidaDacao_unid: string | 'null';
   Num_Ven: number;
 };
+

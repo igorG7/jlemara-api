@@ -1,13 +1,11 @@
 import {
   ResponseFindAllObras,
   ResponseFindObraWithCode,
-} from "Services/Uau/Obra/uau.obra.types";
-import Console, { ConsoleData } from "../../Lib/Console";
-import UauObraService from "../../Services/Uau/Obra/uau.obra.service";
-import { IDevelopment } from "../../Types/Development/Development";
-import DevelpmentController from "../../Controllers/develpment.controller";
-
-import DevelopmentDTO from "../../DTOs/Development/DevelopmentDTO";
+} from "modules/development/integration/development.interface.integration";
+import Console, { ConsoleData } from "../../modules/utils/Console";
+import UauObraService from "../../modules/development/integration/development.integration";
+import DevelopmentDTO from "modules/development/dto/development.format";
+import develpmentController from "modules/development/develpment.controller";
 
 export default class ObraUauWorker {
   private obraUauService = new UauObraService();
@@ -156,7 +154,7 @@ export default class ObraUauWorker {
 
       const developmentFormated = DevelopmentDTO.format(development);
 
-      await DevelpmentController.registerDevelopment(developmentFormated);
+      await develpmentController.registerDevelopment(developmentFormated);
     } catch (error) {
       throw error;
     }

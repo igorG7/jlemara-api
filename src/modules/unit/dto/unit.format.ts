@@ -1,5 +1,5 @@
-import { ResponseUnitUauType } from "Types/Unit/ResponseUnitUau";
 import { IUnit } from "../domain/unit.interface";
+import { ResponseUnitUauType } from "../integration/unit.interface.integration";
 
 export class UnitDTO {
   static toStr(value: unknown) {
@@ -36,7 +36,7 @@ export class UnitDTO {
       category_status:
         String(data.NumCategStatus_unid) === "null"
           ? 0
-          : data.NumCategStatus_unid,
+          : Number(data.NumCategStatus_unid),
       attachment_count: data.anexos_unid,
       block: block,
       lot: lot,
@@ -48,7 +48,7 @@ export class UnitDTO {
       price: String(data.C13_unid) === "null" ? 0 : Number(data.C13_unid),
       product_type_code: data.CodTipProd_unid,
       registration_date: new Date(data.DataCad_unid),
-      sale_number: data.Num_Ven,
+      sale_number: String(data.Num_Ven),
       quantity_available: data.Qtde_unid,
       uau_ref: UnitDTO.formatToUauRef(
         data.Empresa_unid,

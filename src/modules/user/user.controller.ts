@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import Console from "../../Lib/Console";
+import Console from "../utils/Console";
 import bcrypt from "bcryptjs";
 import jwt from 'jsonwebtoken'
 import User from "./infra/user";
