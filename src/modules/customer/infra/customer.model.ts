@@ -5,7 +5,7 @@ const CustomerSchema = new Schema<CustomerType>(
   {
     code_person: { type: Number, index: true, unique: true, required: true },
     full_name: { type: String, trim: true },
-    birth_date: { type: Date || null, required: true },
+    birth_date: { type: Date, default: null },
     status: { type: Number, required: true },
     email: {
       type: String,

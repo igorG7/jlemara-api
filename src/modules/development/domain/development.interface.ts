@@ -1,4 +1,4 @@
-import { IPhoto } from "modules/unit/domain/photo.interface";
+import { IPhoto } from "../../unit/domain/unit.interface";
 
 export interface IDevelopment {
   development_code: string; // Cod_obr

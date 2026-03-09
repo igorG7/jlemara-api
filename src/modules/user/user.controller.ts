@@ -1,9 +1,10 @@
 import { Request, Response } from "express";
 import Console from "../utils/Console";
 import bcrypt from "bcryptjs";
-import jwt from 'jsonwebtoken'
+import jwt from "jsonwebtoken";
 import User from "./infra/user";
 import { UserType } from "./domain/user.interface";
+import UserService from "./user.service";
 
 export type AuthBody = { email: string; password: string };
 export type FindUserBody = { email?: string; id?: string };
@@ -19,26 +20,6 @@ const notReturn = {
 };
 
 class UserController {
-  updateUserAccess = async (id: string) => {
-    const userUpdated = await User.findByIdAndUpdate(
-      id,
-      {
-        $set: {
-          lastAccessAt: new Date(),
-          updatedAt: new Date(),
-        },
-      },
-      { new: true, select: { password: 0 } },
-    );
-
-    return userUpdated;
-  };
-
-  checkUserExists = async (email: string) => {
-    const user = await User.findOne({ email });
-    return user;
-  };
-
   authUser = async (req: Request, res: Response) => {
     try {
       const { email, password }: AuthBody = req.body;
@@ -49,7 +30,7 @@ class UserController {
         Console({ type: "error", message: "Usuário não encontrado." });
         return res
           .status(404)
-          .json({ message: "Usuário não encontrado", error: null });
+          .json({ message: "Usuário não encontrado.", error: null });
       }
 
       const comparePass = await bcrypt.compare(
@@ -67,49 +48,28 @@ class UserController {
         return res.status(400).json({ message: "Usuário inativo." });
       }
 
-      const userUpdated = (await this.updateUserAccess(user._id)) ?? user;
-
-
-      //       CONTEXTO DE ALTERAÇÕES:
-      /* * ARQUITETURA DE SESSÃO CENTRALIZADA (SSO & SEGURANÇA)
-       * ---------------------------------------------------
-       * EVOLUÇÃO: Migração da gestão de cookies do Client-side para Server-side.
-       * * BENEFÍCIOS:
-       * 1. SEGURANÇA (Anti-XSS): Flag 'httpOnly' impede que scripts maliciosos acessem o token.
-       * 2. ESCALABILIDADE (Subdomínios): O uso de '.seudominio.com' garante que módulos
-       * independentes (vendas, obras, lotes) compartilhem a mesma sessão automaticamente.
-       * 3. PERFORMANCE: Payload JWT (ID, Name, Role) evita consultas excessivas ao DB.
-       * * FLUXO:
-       * 1. API valida credenciais e gera JWT assinado com dados de acesso.
-       * 2. O Header 'Set-Cookie' instrui o browser a persistir a sessão de forma segura.
-       * 3. Browser anexa o cookie automaticamente em todas as requisições para dominio e subdomínios.
-       */
-
+      const userUpdated = (await UserService.updateUserAccess(user._id)) ?? user;
 
       const token = jwt.sign(
         {
           id: userUpdated._id,
           name: userUpdated.name,
-          role: userUpdated.role
+          role: userUpdated.role,
         },
         process.env.JWT_SECRET as string,
-        { expiresIn: '7d' }
+        { expiresIn: "7d" },
       );
 
-      Console({
-        type: "success",
-        message: "Usuário autenticado com sucesso.",
-      });
+      Console({ type: "success", message: "Usuário autenticado com sucesso." });
 
-      res.cookie('auth_token', token, {
-        domain: process.env.DOMAIN_DEV!, // Permite acesso em todos os subdomínios
-        path: '/',                 // Disponível em todo o site
-        httpOnly: true,            // Impede leitura via document.cookie (segurança)
-        secure: process.env.NODE_ENV === 'production', // Só envia via HTTPS em produção
-        sameSite: 'lax',           // Permite que o cookie seja enviado em navegações entre subdomínios
-        maxAge: 1 * 4 * 60 * 60 * 1000 // 4 HORAS
+      res.cookie("auth_token", token, {
+        domain: process.env.DOMAIN_DEV!,
+        path: "/",
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 1 * 4 * 60 * 60 * 1000, // 4 horas
       });
-
 
       return res.status(200).json({
         message: "Usuário autenticado com sucesso.",
@@ -123,14 +83,14 @@ class UserController {
       Console({ type: "error", message: "Erro inesperado." });
       return res
         .status(500)
-        .json({ message: "Erro interno inesperado", error });
+        .json({ message: "Erro interno inesperado.", error });
     }
   };
 
   registerUser = async (req: Request, res: Response) => {
     try {
       const body: UserType = req.body;
-      const userExist = await this.checkUserExists(body.email as string);
+      const userExist = await UserService.checkUserExists(body.email as string);
 
       if (userExist) {
         Console({ type: "error", message: "Usuário já cadastrado." });
@@ -161,7 +121,7 @@ class UserController {
       Console({ type: "error", message: "Erro inesperado." });
       return res
         .status(500)
-        .json({ message: "Erro interno inesperado", error });
+        .json({ message: "Erro interno inesperado.", error });
     }
   };
 
@@ -183,38 +143,40 @@ class UserController {
       Console({ type: "success", message: "Usuário encontrado com sucesso." });
       return res
         .status(200)
-        .json({ message: "Usuário encontrado com sucesso.", user });
+        .json({ message: "Usuário encontrado com sucesso.", data: user });
     } catch (error) {
       Console({ type: "error", message: "Erro interno inesperado." });
       return res
         .status(500)
-        .json({ message: "Erro interno inesperado", error });
+        .json({ message: "Erro interno inesperado.", error });
     }
   };
+
   findUserByRole = async (req: Request, res: Response) => {
     try {
       const { role }: FindUserByRole = req.body;
 
+      const users = await User.find(
+        { role: { $in: [role] }, isActive: true },
+        { ...notReturn },
+      );
 
-
-      const users = await User.find({ role: { $in: [role] }, isActive: true }, { ...notReturn });
-
-      if (!users) {
-        Console({ type: "error", message: "Usuários não encontrados." });
+      if (!users.length) {
+        Console({ type: "error", message: "Nenhum usuário encontrado." });
         return res
           .status(404)
-          .json({ message: "Usuário não encontrado.", error: null });
+          .json({ message: "Nenhum usuário encontrado.", error: null });
       }
 
       Console({ type: "success", message: "Usuários encontrados com sucesso." });
       return res
         .status(200)
-        .json({ message: "Usuário encontrado com sucesso.", users });
+        .json({ message: "Usuários encontrados com sucesso.", data: users });
     } catch (error) {
       Console({ type: "error", message: "Erro interno inesperado." });
       return res
         .status(500)
-        .json({ message: "Erro interno inesperado", error });
+        .json({ message: "Erro interno inesperado.", error });
     }
   };
 
@@ -228,16 +190,18 @@ class UserController {
       if (!activeUsers.length) {
         Console({ type: "error", message: "Nenhum usuário encontrado." });
         return res
-          .json(404)
+          .status(404)
           .json({ message: "Nenhum usuário encontrado.", error: null });
       }
 
-      return res.status(200).json({ activeUsers });
+      return res
+        .status(200)
+        .json({ message: "Usuários encontrados com sucesso.", data: activeUsers });
     } catch (error) {
       Console({ type: "error", message: "Erro interno inesperado." });
       return res
         .status(500)
-        .json({ message: "Erro interno inesperado", error });
+        .json({ message: "Erro interno inesperado.", error });
     }
   };
 
@@ -268,7 +232,7 @@ class UserController {
       Console({ type: "error", message: "Erro interno inesperado." });
       return res
         .status(500)
-        .json({ message: "Erro interno inesperado", error });
+        .json({ message: "Erro interno inesperado.", error });
     }
   };
 
@@ -281,10 +245,7 @@ class UserController {
 
       const user = await User.findByIdAndUpdate(
         id,
-        {
-          password: newHashPass,
-          updatedAt: new Date(),
-        },
+        { password: newHashPass, updatedAt: new Date() },
         { new: true, select: { ...notReturn } },
       ).lean();
 
@@ -304,7 +265,7 @@ class UserController {
       Console({ type: "error", message: "Erro interno inesperado." });
       return res
         .status(500)
-        .json({ message: "Erro interno inesperado", error });
+        .json({ message: "Erro interno inesperado.", error });
     }
   };
 }

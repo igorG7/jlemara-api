@@ -18,7 +18,7 @@ routes.get("/address/:code_person", findAdress, Customer.findAddressCustomer);
 // A utilização de POST de faz necessária para um envio de dados mais complexo para realizar a busca.
 routes.post("/search", findCustomer, Customer.findCustomer);
 
-routes.post("/addres", findManyAdress, Customer.findManyAddressCustomer);
+routes.post("/address", findManyAdress, Customer.findManyAddressCustomer);
 
 // Rotas de atualização (PUT/PATCH)
 routes.patch("/update", updateCustomer, Customer.updateCustomer);

@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import Console from "../utils/Console";
 import Customer from "./infra/customer.model";
-import { CustomerType } from "./domain/customer.interface";
 
 const notReturn = {
   password: 0,
@@ -10,139 +9,13 @@ const notReturn = {
 };
 
 class CustomerController {
-  async registerCustomer(data: CustomerType) {
-    try {
-      if (!data) {
-        Console({ type: "error", message: "Data vazio." });
-        return {
-          error: null,
-          message: "Data vazio.",
-          data: null,
-        };
-      }
-
-      const { code_person } = data;
-
-      Console({
-        type: "log",
-        message: `Cadastrando/atualizando cliente ${code_person}...`,
-      });
-
-      const customer = await Customer.findOneAndUpdate(
-        { code_person },
-        { ...data },
-        { upsert: true, new: true, select: { ...notReturn } },
-      ).lean();
-
-      Console({
-        type: "success",
-        message: "Cliente cadastrado/atualizado com sucesso!",
-      });
-
-      return {
-        message: "Cliente cadastrado/atualizado com sucesso!",
-        data: customer,
-      };
-    } catch (error) {
-      Console({
-        type: "error",
-        message: "Erro ao cadastrar/atualizar cliente.",
-      });
-
-      return {
-        message: "Erro ao cadastrar/atualizar cliente.",
-        error,
-        data: null,
-      };
-    }
-  }
-
-  async registerBatchesCustomer(data: any[]) {
-    try {
-      if (!data || !data.length) {
-        Console({ type: "error", message: "Data vazio." });
-        return {
-          error: null,
-          message: "Data vazio.",
-          data: null,
-        };
-      }
-
-      const total = data.length;
-      let success = 0;
-      let failure = 0;
-
-      Console({
-        type: "log",
-        message: `Sincronizando lista de clientes (${total})...`,
-      });
-
-      for (const customer of data as CustomerType[]) {
-        const { code_person } = customer;
-
-        if (!code_person && code_person !== 0) {
-          Console({
-            type: "warn",
-            message: "Código pessoa vazio, ignorando registro.",
-          });
-
-          failure++;
-
-          continue;
-        }
-
-        try {
-          const response = await this.registerCustomer(customer);
-
-          if (!response.data) {
-            Console({
-              type: "warn",
-              message: `Falha ao sincronizar cliente ${code_person}: ${response.message}`,
-            });
-
-            failure++;
-
-            continue;
-          }
-
-          Console({
-            type: "success",
-            message: `Cliente ${code_person} sincronizado com sucesso!`,
-          });
-
-          success++;
-        } catch (error) {
-          failure++;
-
-          Console({
-            type: "error",
-            message: `Erro ao sincronizar cliente ${code_person}.`,
-          });
-        }
-      }
-
-      const message = `Total de clientes sincronizados: ${success} de ${total}. Falhas: ${failure}`;
-      Console({ type: "success", message });
-    } catch (error) {
-      Console({
-        type: "error",
-        message: "Erro ao sincronizar clientes.",
-      });
-      return {
-        message: "Erro ao sincronizar clientes.",
-        error,
-        data: null,
-      };
-    }
-  }
-
   async createClient(req: Request, res: Response) {
     try {
       const body = req.body;
       await Customer.create(body);
-      res.status(201).json({ message: "cliente criado", body });
+      res.status(201).json({ message: "Cliente criado.", data: body });
     } catch (error) {
-      res.status(500).json({ error });
+      res.status(500).json({ message: "Erro interno inesperado.", error });
     }
   }
 
@@ -150,18 +23,19 @@ class CustomerController {
     try {
       const query = req.body;
 
-      Console({ type: "log", message: "Buscando cliente" });
-      const customer = await Customer.findOne(query, {
-        ...notReturn,
-      });
+      Console({ type: "log", message: "Buscando cliente." });
+
+      const customer = await Customer.findOne(query, { ...notReturn });
 
       if (!customer) {
+        Console({ type: "warn", message: "Cliente não encontrado." });
         return res
           .status(404)
           .json({ message: "Cliente não encontrado.", error: null });
       }
 
       Console({ type: "success", message: "Busca concluída com sucesso." });
+
       return res
         .status(200)
         .json({ message: "Busca concluída.", data: customer });
@@ -176,12 +50,11 @@ class CustomerController {
   async findCustomerByPartialName(req: Request, res: Response) {
     try {
       const name = req.params.name;
-      Console({ type: "log", message: "Buscando clientes" });
+
+      Console({ type: "log", message: "Buscando clientes." });
 
       const customers = await Customer.find(
-        {
-          full_name: { $regex: name, $options: "i" },
-        },
+        { full_name: { $regex: name, $options: "i" } },
         { ...notReturn },
       ).lean();
 
@@ -194,10 +67,7 @@ class CustomerController {
         });
       }
 
-      Console({
-        type: "success",
-        message: "Clientes encontrados com sucesso.",
-      });
+      Console({ type: "success", message: "Clientes encontrados com sucesso." });
 
       return res.status(200).json({
         message: "Clientes encontrados com sucesso.",
@@ -218,19 +88,21 @@ class CustomerController {
 
       Console({ type: "log", message: "Buscando todos os clientes." });
 
-      const customers = await Customer.find(
-        {},
-        { ...notReturn },
-        {
-          sort: { full_name: 1 },
-          limit: customersPerPage,
-          skip: (page - 1) * customersPerPage,
-        },
-      ).lean();
+      const [customers, total] = await Promise.all([
+        Customer.find(
+          {},
+          { ...notReturn },
+          {
+            sort: { full_name: 1 },
+            limit: customersPerPage,
+            skip: (page - 1) * customersPerPage,
+          },
+        ).lean(),
+        Customer.countDocuments(),
+      ]);
 
       if (!customers.length) {
         Console({ type: "warn", message: "Nenhum cliente encontrado." });
-
         return res.status(404).json({
           message: "Nenhum cliente encontrado.",
           error: null,
@@ -239,9 +111,17 @@ class CustomerController {
       }
 
       Console({ type: "success", message: "Busca concluída com sucesso." });
-      return res
-        .status(200)
-        .json({ message: "Busca concluída com sucesso.", data: customers });
+
+      return res.status(200).json({
+        message: "Busca concluída com sucesso.",
+        data: customers,
+        pagination: {
+          total,
+          page,
+          limit: customersPerPage,
+          pages: Math.ceil(total / customersPerPage),
+        },
+      });
     } catch (error) {
       Console({ type: "error", message: "Erro interno inesperado." });
       return res
@@ -257,15 +137,18 @@ class CustomerController {
 
       Console({ type: "log", message: "Buscando clientes ativos." });
 
-      const customers = await Customer.find(
-        { status: 1 },
-        { ...notReturn },
-        {
-          sort: { full_name: 1 },
-          limit: customersPerPage,
-          skip: (page - 1) * customersPerPage,
-        },
-      ).lean();
+      const [customers, total] = await Promise.all([
+        Customer.find(
+          { status: 1 },
+          { ...notReturn },
+          {
+            sort: { full_name: 1 },
+            limit: customersPerPage,
+            skip: (page - 1) * customersPerPage,
+          },
+        ).lean(),
+        Customer.countDocuments({ status: 1 }),
+      ]);
 
       if (!customers.length) {
         Console({ type: "warn", message: "Nenhum cliente encontrado." });
@@ -277,9 +160,17 @@ class CustomerController {
       }
 
       Console({ type: "success", message: "Busca concluída com sucesso." });
-      return res
-        .status(200)
-        .json({ message: "Busca concluída com sucesso.", data: customers });
+
+      return res.status(200).json({
+        message: "Busca concluída com sucesso.",
+        data: customers,
+        pagination: {
+          total,
+          page,
+          limit: customersPerPage,
+          pages: Math.ceil(total / customersPerPage),
+        },
+      });
     } catch (error) {
       Console({ type: "error", message: "Erro interno inesperado." });
       return res
@@ -305,10 +196,8 @@ class CustomerController {
           .json({ message: "Cliente não encontrado.", error: null });
       }
 
-      Console({
-        type: "success",
-        message: "Atualização de cliente concluída.",
-      });
+      Console({ type: "success", message: "Atualização de cliente concluída." });
+
       return res.status(200).json({
         message: "Atualização de cliente concluída.",
         data: customerUpdated,
@@ -337,10 +226,10 @@ class CustomerController {
       );
 
       if (!customerUpdated) {
-        Console({ type: "error", message: "Cliente não encontrado" });
+        Console({ type: "error", message: "Cliente não encontrado." });
         return res
           .status(404)
-          .json({ message: "Cliente não encontrado", error: null });
+          .json({ message: "Cliente não encontrado.", error: null });
       }
 
       Console({ type: "success", message: "Telefone atualizado com sucesso." });
@@ -350,10 +239,7 @@ class CustomerController {
         data: customerUpdated,
       });
     } catch (error) {
-      Console({
-        type: "error",
-        message: "Customer: Erro interno inesperado.",
-      });
+      Console({ type: "error", message: "Erro interno inesperado." });
       return res
         .status(500)
         .json({ message: "Erro interno inesperado.", error });
@@ -364,10 +250,7 @@ class CustomerController {
     try {
       const { codes }: { codes: string[] | number[] } = req.body;
 
-      Console({
-        type: "log",
-        message: "Customer: Buscando endereço dos clientes.",
-      });
+      Console({ type: "log", message: "Buscando endereço dos clientes." });
 
       const customers = await Customer.find(
         { code_person: { $in: codes } },
@@ -375,32 +258,22 @@ class CustomerController {
       ).lean();
 
       if (!customers.length) {
-        Console({
-          type: "error",
-          message:
-            "Customer: Nenhum cliente encontrado. | Origem: 'findAddressCustomer'",
-        });
+        Console({ type: "error", message: "Nenhum cliente encontrado." });
         return res.status(404).json({
-          message: "Nenhum cliente encontrado",
+          message: "Nenhum cliente encontrado.",
           error: null,
           data: [],
         });
       }
 
-      Console({
-        type: "success",
-        message: "Customer: Busca por endereços concluída.",
-      });
+      Console({ type: "success", message: "Busca por endereços concluída." });
 
       return res.status(200).json({
         message: "Busca por endereços concluída.",
         data: customers,
       });
     } catch (error) {
-      Console({
-        type: "error",
-        message: "Customer: Erro interno inesperado.",
-      });
+      Console({ type: "error", message: "Erro interno inesperado." });
       return res
         .status(500)
         .json({ message: "Erro interno inesperado.", error });
@@ -411,10 +284,7 @@ class CustomerController {
     try {
       const code_person = req.params.code_person;
 
-      Console({
-        type: "log",
-        message: "Customer: Buscando endereço do cliente.",
-      });
+      Console({ type: "log", message: "Buscando endereço do cliente." });
 
       const customer = await Customer.findOne(
         { code_person },
@@ -422,30 +292,20 @@ class CustomerController {
       ).lean();
 
       if (!customer) {
-        Console({
-          type: "error",
-          message:
-            "Customer: Cliente não encontrado. | Origem: 'findAddressCustomer'",
-        });
+        Console({ type: "error", message: "Cliente não encontrado." });
         return res
           .status(404)
-          .json({ message: "Cliente não encontrado", error: null });
+          .json({ message: "Cliente não encontrado.", error: null });
       }
 
-      Console({
-        type: "success",
-        message: "Customer: Busca por endereço concluída.",
-      });
+      Console({ type: "success", message: "Busca por endereço concluída." });
 
       return res.status(200).json({
         message: "Busca por endereço concluída.",
         data: customer,
       });
     } catch (error) {
-      Console({
-        type: "error",
-        message: "Customer: Erro interno inesperado.",
-      });
+      Console({ type: "error", message: "Erro interno inesperado." });
       return res
         .status(500)
         .json({ message: "Erro interno inesperado.", error });

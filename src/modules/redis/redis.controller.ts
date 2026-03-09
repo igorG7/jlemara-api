@@ -106,7 +106,6 @@ class RedisController {
    * Retorna true se conseguiu a trava, false se o CPF já estiver travado.
    */
   async setCustomerLock(cpf: string): Promise<boolean> {
-    return true
     try {
       const key = REDIS_KEYS.CUSTOMER_LOCK(cpf);
       // 'NX' garante que só grava se não existir.
@@ -119,7 +118,6 @@ class RedisController {
   }
 
   async removeCustomerLock(cpf: string): Promise<boolean> {
-    return true
     return this.delete(REDIS_KEYS.CUSTOMER_LOCK(cpf));
   }
 

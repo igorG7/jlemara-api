@@ -2,12 +2,12 @@
 import uau from "../../utils/Uau";
 import Console, { ConsoleData } from "../../utils/Console";
 import parseBRDate from "../../utils/dateParser";
-import { validateCpf } from "modules/utils/validate.cpf.utils";
+import { validateCpf } from "../../utils/validate.cpf.utils";
 import { CustomerAddress, CustomersWithSale, CustomerWithCodeOrCPF, DeleteCustomerPhones, RecordCustomerDTO, RecordPhoneCustomerDTO, ResponseCustomerFindAdress, ResponseCustomerFindUnits, ResponseCustomerPhones, ResponseFindCustomersWithSale, ResponseFindCustomerWithCPF, ResponseFindCustomerWithPersonCode } from "./customer.interface.integration";
-import { validateCustomerCode } from "modules/utils/validate.customer.code";
-import RedisController from "modules/redis/redis.controller";
+import { validateCustomerCode } from "../../utils/validate.customer.code";
+import RedisController from "../../redis/redis.controller";
 
-export default class UauCustomerService {
+class UauCustomerService {
   private redis = RedisController
   private api = uau;
 
@@ -446,3 +446,6 @@ export default class UauCustomerService {
   }
 
 }
+
+
+export default new UauCustomerService()

@@ -6,14 +6,14 @@ import { findUnits, addPhoto, deletePhoto, unitPhoto, updatePhoto } from "./midd
 
 const routes = Router();
 
-routes.get("/avaliables/page/:page/limit/:limit", Unit.findAvaliables);
+routes.get("/availables/page/:page/limit/:limit", Unit.findAvailables);
 
 
 routes.post("/create", Unit.createTemp);
 routes.post("/search/page/:page/limit/:limit", findUnits, Unit.findUnits,);
 
 
-routes.patch("/update", addPhoto, Unit.updateUnit);
+routes.patch("/update", /* addPhoto */ Unit.updateUnit);
 
 
 routes.patch("/photo/add", unitPhoto, Unit.addPhotos);

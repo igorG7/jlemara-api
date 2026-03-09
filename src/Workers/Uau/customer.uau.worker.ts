@@ -1,40 +1,43 @@
 //src\Workers\Uau\customer.uau.worker.ts
 import Console, { ConsoleData } from "../../modules/utils/Console";
 import { CustomersWithSale } from "../../modules/customer/integration/customer.interface.integration";
-import { AddressType, CustomerType } from "modules/customer/domain/customer.interface";
-import parseBRDate from "../../modules/utils/dateParser";
-import mountCustomerAdress from "./utils/mountCustomerAdress";
 import UauCustomerService from "modules/customer/integration/customer.integration";
-import customerController from "modules/customer/customer.controller";
-
+import CustomerService from "modules/customer/customer.service";
+import { CustomerDTO } from "modules/customer/dto/customer.format";
 
 export default class CustomerUauWorker {
   private customerUauService = new UauCustomerService();
-  private customerController = customerController
-  private isRunning = false
+  private isRunning = false;
 
   async start() {
-    if (this.isRunning) return
+    if (this.isRunning) return;
     try {
-      this.isRunning = true
-      await this.rescueErpCustomers()
-      this.isRunning = false
-      return
+      this.isRunning = true;
+      await this.rescueErpCustomers();
+      this.isRunning = false;
+      return;
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Problemas na inicialização do worker etl"
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Problemas na inicialização do worker etl";
       Console({ type: "error", message });
-      ConsoleData({ type: "error", data: error })
-      return
+      ConsoleData({ type: "error", data: error });
+      return;
     }
   }
 
   private async rescueErpCustomers() {
     console.time("⏳ tempo total worker ⏳");
 
-    Console({ type: "log", message: "Iniciando verificação em lote no ERP UAU." });
+    Console({
+      type: "log",
+      message: "Iniciando verificação em lote no ERP UAU.",
+    });
 
     try {
-      const customersWithSale = (await this.customerUauService.findCustomersWithSale()) as CustomersWithSale[];
+      const customersWithSale =
+        (await this.customerUauService.findCustomersWithSale()) as CustomersWithSale[];
 
       if (!customersWithSale || customersWithSale.length === 0) {
         Console({ type: "success", message: "Nenhum cliente encontrado." });
@@ -43,103 +46,83 @@ export default class CustomerUauWorker {
 
       const totalItems = customersWithSale.length;
 
-      Console({ type: "log", message: `${totalItems} clientes identificados no ERP.` });
+      Console({
+        type: "log",
+        message: `${totalItems} clientes identificados no ERP.`,
+      });
 
       let saved = 0;
       let errorCount = 0;
 
-      // --- CONFIGURAÇÃO DE LOTE (CHUNKS) ---
-      const CHUNK_SIZE = 10; // Processa CHUNK_SIZE clientes por vez em paralelo
+      const CHUNK_SIZE = 10;
 
-      const dataToProcess = customersWithSale // utilizado para testes com um .slice(x, y)
+      const dataToProcess = customersWithSale;
 
       for (let i = 0; i < dataToProcess.length; i += CHUNK_SIZE) {
-
-        // [clientes atual] = chunk
         const chunk = dataToProcess.slice(i, i + CHUNK_SIZE);
 
-        Console({ type: "log", message: `Processando lote: ${i} até ${i + CHUNK_SIZE} de ${totalItems}...` });
+        Console({
+          type: "log",
+          message: `Processando lote: ${i} até ${i + CHUNK_SIZE} de ${totalItems}...`,
+        });
 
         await Promise.all(
           chunk.map(async (item) => {
             try {
               if (!item.Cod_pes) return;
 
-              const detail = await this.customerUauService.findCustomerWithCode(item.Cod_pes);
+              const detail = await this.customerUauService.findCustomerWithCode(
+                item.Cod_pes,
+              );
               if (!detail) return;
 
-              const phones = await this.customerUauService.findPhonesCustomer(item.Cod_pes);
+              const phones = await this.customerUauService.findPhonesCustomer(
+                item.Cod_pes,
+              );
 
-              const address = await this.customerUauService.findAdressCustomer(item.Cod_pes);
+              const address = await this.customerUauService.findAdressCustomer(
+                item.Cod_pes,
+              );
 
               const fullData = { ...detail, phones, address };
 
-              await this.formatCustomerAndSave(fullData);
+              if (!fullData.cpf_pes) throw new Error("CPF ausente.");
+
+              const formatted = CustomerDTO.format(fullData);
+
+              await CustomerService.registerCustomer(formatted);
 
               saved++;
             } catch (error) {
               errorCount++;
-              const message = error instanceof Error ? error.message : "Problemas no processamento do cliente " + item.Cod_pes
-              Console({ type: "error", message })
+              const message =
+                error instanceof Error
+                  ? error.message
+                  : "Problemas no processamento do cliente " + item.Cod_pes;
+              Console({ type: "error", message });
             }
-          })
+          }),
         );
-        await new Promise(resolve => setTimeout(resolve, 1000)); // respiro para a api uau de 1s
+
+        await new Promise((resolve) => setTimeout(resolve, 1000));
       }
 
-      Console({ type: "success", message: `Sincronismo finalizado: ${saved} salvos, ${errorCount} falhas.` });
+      Console({
+        type: "success",
+        message: `Sincronismo finalizado: ${saved} salvos, ${errorCount} falhas.`,
+      });
 
       console.timeEnd("⏳ tempo total worker ⏳");
-
     } catch (error) {
-
-      const message = error instanceof Error ? error.message : "Problemas no processamento worker uau customer "
-      Console({ type: "error", message: "Falha crítica no Worker de Sincronismo." });
-      Console({ type: "error", message })
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Problemas no processamento worker uau customer";
+      Console({
+        type: "error",
+        message: "Falha crítica no Worker de Sincronismo.",
+      });
+      Console({ type: "error", message });
     }
   }
-
-  private async formatCustomerAndSave(customer: any) {
-    if (!customer || !customer.cpf_pes) {
-      throw new Error("CPF ausente.");
-    }
-
-    try {
-      const addressRaw = customer.address?.[0] || {};
-
-      const phonesRaw = (customer.phones || []) as Array<{ Telefone: string; DDD: string }>;
-
-      const phone_numbers = phonesRaw.map(
-        (p) => `${p.DDD}${String(p.Telefone).replace(/[-\s]/g, "")} `
-      );
-
-      const address_person: AddressType = mountCustomerAdress(addressRaw)
-
-      const type_person = Number(customer.tipo_pes) === 0 ? "PF" : "PJ";
-
-      const formatted: CustomerType = {
-        code_person: customer.cod_pes,
-        full_name: customer.nome_pes,
-        birth_date: parseBRDate(customer.dtnasc_pes),
-        email: customer.Email_pes || "",
-        type_person,
-        cpf_person: type_person === "PF" ? customer.cpf_pes : "",
-        cnpj_person: type_person === "PJ" ? customer.cpf_pes : "",
-        address_person,
-        enterprise: [""],
-        trade_name: customer.NomeFant_Pes || "",
-        password: customer.Senha_pes || "",
-        phone_numbers,
-        status: customer.Status_pes
-      };
-
-
-      await this.customerController.registerCustomer(formatted);
-
-    } catch (error) {
-      throw error;
-    }
-  }
-
-
 }

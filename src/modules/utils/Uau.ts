@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, InternalAxiosRequestConfig } from "axios";
-import RedisController from "../Controllers/redis.controller"; // Ajuste o path conforme sua estrutura
+import RedisController from "../redis/redis.controller";
 import Console, { ConsoleData } from "./Console";
 
 /**
@@ -15,11 +15,11 @@ import Console, { ConsoleData } from "./Console";
  * const { data } = await uau.get('/Obras/Consultar');
  */
 
-const redis = new RedisController();
+const redis = RedisController;
 
 // Instância base do Axios para o UAU
 const uau: AxiosInstance = axios.create({
-  baseURL: process.env.UAU_API_PATH!,
+  baseURL: process.env.UAU_API_DEV!,
   timeout: 45000, // segundos timeout
   headers: {
     Accept: "application/json",
@@ -47,7 +47,7 @@ uau.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
 
       // Chamada direta ao endpoint de autenticação (usando axios puro para evitar loop)
       const response = await axios.post(
-        `${process.env.UAU_API_PATH}/Autenticador/AutenticarUsuario`,
+        `${process.env.UAU_API_DEV}/Autenticador/AutenticarUsuario`,
         {
           Login: process.env.UAU_USER!,
           Senha: process.env.UAU_PASSWORD!,

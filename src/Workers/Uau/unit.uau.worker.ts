@@ -1,8 +1,7 @@
-import Unit from "../../modules/unit/unit.controller";
 import Console, { ConsoleData } from "../../modules/utils/Console";
 import UauUnidadeService from "../../modules/unit/integration/unit.integration";
 import { UnitDTO } from "modules/unit/dto/unit.format";
-
+import UnitService from "modules/unit/unit.service";
 
 export default class UnitWorker {
   private isRunning = false;
@@ -33,7 +32,7 @@ export default class UnitWorker {
       message: "Iniciando verificação em lote de unidades no ERP UAU.",
     });
     try {
-      const CHUNK_SIZE = 50; // Processa CHUNK_SIZE obras por vez em paralelo
+      const CHUNK_SIZE = 50;
 
       console.time("⏳ tempo total busca no erp ⏳");
 
@@ -52,7 +51,7 @@ export default class UnitWorker {
 
       console.time("⏳ tempo total de cadastro no banco ⏳");
 
-      const dataToProcess = units; // utilizado para testes com um .slice(x, y)
+      const dataToProcess = units;
 
       for (let i = 0; i < dataToProcess.length; i += CHUNK_SIZE) {
         const chunk = dataToProcess.slice(i, i + CHUNK_SIZE);
@@ -78,7 +77,7 @@ export default class UnitWorker {
               }
 
               const unitFormated = UnitDTO.format(unit);
-              await Unit.registerUnit(unitFormated);
+              await UnitService.registerUnit(unitFormated);
 
               success++;
             } catch (error) {
@@ -92,26 +91,22 @@ export default class UnitWorker {
           }),
         );
 
-        await new Promise((resolve) => setTimeout(resolve, 1000)); // respiro para a API UAU de 1s
+        await new Promise((resolve) => setTimeout(resolve, 1000));
       }
 
       console.timeEnd("⏳ tempo total de cadastro no banco ⏳");
 
       Console({
         type: "log",
-        message: `Foram encontradas ${total} unidades no ERP. Detalhadas resgatadas: ${success}. Falhas: ${failure}. Iniciando persistência no DB ...`,
+        message: `Foram encontradas ${total} unidades no ERP. Cadastradas: ${success}. Falhas: ${failure}.`,
       });
     } catch (error) {
       const message =
         error instanceof Error
           ? error.message
-          : "Problemas no processamento worker uau customer ";
+          : "Problemas no processamento worker uau units";
 
-      Console({
-        type: "error",
-        message: "Falha crítica no Worker de Sincronismo.",
-      });
-
+      Console({ type: "error", message: "Falha crítica no Worker de Sincronismo." });
       Console({ type: "error", message });
     }
   }

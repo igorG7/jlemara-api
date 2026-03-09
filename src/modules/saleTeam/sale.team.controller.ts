@@ -49,12 +49,14 @@ class TeamController {
 
   async createTeam(req: Request, res: Response) {
     try {
-      const payload = req.body;
+      const { name, manager, description, members, isActive } = req.body;
 
       const newTeam = await SaleTeam.create({
-        ...payload,
-        members: payload.members || [],
-        isActive: true
+        name,
+        manager,
+        description,
+        members: members || [],
+        isActive: isActive || true
       }) as SaleTeamType
 
 

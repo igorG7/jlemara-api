@@ -1,5 +1,8 @@
 
 export async function validateCustomerCode(value: number): Promise<Boolean> {
-
-    return false
+    if (!value) {
+        return false
+    } else {
+        return true
+    }
 }

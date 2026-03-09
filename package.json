@@ -6,7 +6,7 @@
     "nodemon": "nodemon src/server.ts",
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "build": "tsc",
-    "start": "node dist/server.js",
+    "start": "node dist/src/server.js",
     "lint": "eslint \"src/**/*.ts\"",
     "etl": "ts-node -r  ./src/Workers/run.ts"
   },

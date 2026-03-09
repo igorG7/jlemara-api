@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { FindUserBody, FindUserByRole, UpdatePassBody, UpdateUserBody } from "../user.controller";
-import Console from "modules/utils/Console";
+import Console from "../../utils/Console";
 import { UserType } from "../domain/user.interface";
 
 export const findUser = (

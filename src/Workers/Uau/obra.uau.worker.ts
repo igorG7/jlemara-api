@@ -5,7 +5,7 @@ import {
 import Console, { ConsoleData } from "../../modules/utils/Console";
 import UauObraService from "../../modules/development/integration/development.integration";
 import DevelopmentDTO from "modules/development/dto/development.format";
-import develpmentController from "modules/development/develpment.controller";
+import DevelopmentService from "modules/development/development.service";
 
 export default class ObraUauWorker {
   private obraUauService = new UauObraService();
@@ -36,8 +36,7 @@ export default class ObraUauWorker {
     });
 
     try {
-      // --- CONFIGURAÇÃO DE LOTE (CHUNKS) ---
-      const CHUNK_SIZE = 50; // Processa CHUNK_SIZE obras por vez em paralelo
+      const CHUNK_SIZE = 50;
 
       console.time("⏳ tempo total busca no erp ⏳");
 
@@ -55,7 +54,7 @@ export default class ObraUauWorker {
 
       const obrasInfoCompleta: ResponseFindObraWithCode[] = [];
 
-      const dataToProcess = obrasErp; // utilizado para testes com um .slice(x, y)
+      const dataToProcess = obrasErp;
 
       for (let i = 0; i < dataToProcess.length; i += CHUNK_SIZE) {
         const chunk = dataToProcess.slice(i, i + CHUNK_SIZE);
@@ -94,31 +93,20 @@ export default class ObraUauWorker {
           }),
         );
 
-        await new Promise((resolve) => setTimeout(resolve, 1000)); // respiro para a API UAU de 1s
+        await new Promise((resolve) => setTimeout(resolve, 1000));
       }
 
       console.timeEnd("⏳ tempo total busca no erp ⏳");
 
       Console({
         type: "log",
-        message: `
-                Foram encontradas ${totalItems} obras no ERP. Detalhadas resgatadas: ${qtdObrasErpCompletas}. Falhas: ${qtdErroDeBusca}.
-                Iniciando persistência no DB ...
-                `,
+        message: `Foram encontradas ${totalItems} obras no ERP. Detalhadas resgatadas: ${qtdObrasErpCompletas}. Falhas: ${qtdErroDeBusca}. Iniciando persistência no DB...`,
       });
 
       console.time("⏳ tempo total persistencia no backend ⏳");
 
-      /* ============================================================
-       * TRECHO PARA PERSISTÊNCIA -> IgorG7
-       *
-       * Dado disponível: obrasInfoCompleta (ResponseFindObraWithCode[])
-       * Quantidade:      obrasInfoCompleta.length registros prontos para upsert
-       * Referência tipo: src/Services/Uau/Obra/uau.obra.types.ts
-       * ============================================================ */
-
       for (const development of obrasInfoCompleta) {
-        this.formatDevelopmentAndSave(development);
+        await this.formatDevelopmentAndSave(development);
       }
 
       console.timeEnd("⏳ tempo total persistencia no backend ⏳");
@@ -154,7 +142,7 @@ export default class ObraUauWorker {
 
       const developmentFormated = DevelopmentDTO.format(development);
 
-      await develpmentController.registerDevelopment(developmentFormated);
+      await DevelopmentService.registerDevelopment(developmentFormated);
     } catch (error) {
       throw error;
     }

@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import controller from './develpment.controller'
+import controller from './development.controller'
 import {
   findDevelopment, infoUpdate, infraUpdate,
   photoDelete, photoUpdate, updateAdress, updateDevelopment
@@ -39,7 +39,7 @@ routes.patch(
   controller.updateDevelopment,
 );
 
-routes.patch("/update/photos", photoDelete, controller.addPhoto);
-routes.patch("/delete/photos", photoUpdate, controller.removePhoto);
+routes.patch("/update/photos", photoUpdate, controller.addPhoto);
+routes.patch("/delete/photos", photoDelete, controller.removePhoto);
 
 export default routes;
