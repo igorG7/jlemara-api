@@ -1,8 +1,8 @@
 //src\Workers\run.ts
 import cron from 'node-cron';
 import CustomerUauWorker from './Uau/customer.uau.worker';
-import Console, { ConsoleData } from '../Lib/Console';
-import ConnectionDB from '../Configs/ConnectionDB';
+import Console, { ConsoleData } from '../modules/utils/Console';
+import ConnectionDB from '../db/ConnectionDB';
 
 
 const customerUauWorker = new CustomerUauWorker()

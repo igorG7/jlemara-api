@@ -1,15 +1,18 @@
 import { configDotenv } from "dotenv";
 
-import app from "./app";
+import app, { init } from "./app";
 
 configDotenv();
 
 const PORT = process.env.PORT!;
 const HOST = process.env.HOST!;
 
-app.listen(PORT, async () => {
+init().then(() => {
+  app.listen(PORT, async () => {
+    console.log("Servidor iniciado.");
+    console.log(`Servidor rodando em http://${HOST}:${PORT}.`);
 
-  console.log("Servidor iniciado.");
-  console.log(`Servidor rodando em http://${HOST}:${PORT}.`);
 
+
+  });
 });

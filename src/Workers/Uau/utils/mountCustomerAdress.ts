@@ -1,5 +1,5 @@
-import { CustomerAddress } from "Services/Uau/Customer/uau.customer.dto";
-import { AddressType } from "Types/CustomerTypes";
+import { CustomerAddress } from "modules/customer/integration/customer.interface.integration";
+import { AddressType } from "modules/customer/domain/customer.interface";
 
 // src/Utils/dateParser.ts
 const mountCustomerAdress = (value: CustomerAddress): any => {

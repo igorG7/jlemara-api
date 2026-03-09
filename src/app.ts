@@ -1,15 +1,15 @@
 import express from "express";
 import cors from "cors";
-import './Lib/Redis'
-import ConnectionDB from "./Configs/ConnectionDB";
-import routes from "./Routes/routes";
+import "./modules/redis/infra/redis";
+import ConnectionDB from "./db/ConnectionDB";
 import cookieParser from "cookie-parser";
+import routes from "./modules/routes/routes";
+
 class App {
   public app;
 
   constructor() {
     this.app = express();
-    this.config();
     this.middlewares();
     this.routes();
   }
@@ -25,9 +25,12 @@ class App {
     this.app.use(express.urlencoded({ extended: true }));
   }
 
-  async config() {
+  async init() {
     await ConnectionDB.connect();
   }
 }
 
-export default new App().app;
+const appInstance = new App();
+
+export const init = () => appInstance.init();
+export default appInstance.app;
